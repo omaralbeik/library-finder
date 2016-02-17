@@ -1,0 +1,25 @@
+{
+  "name": "library-finder",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Omar Albeik"
+  ],
+  "license": "Apache-2.0",
+  "moduleType": [],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ajax": "^0.0.15",
+    "animate.css": "^3.5.1",
+    "bootstrap": "^3.3.6",
+    "firebase": "^2.4.0",
+    "normalize-css": "normalize.css#^3.0.3"
+  }
+}
