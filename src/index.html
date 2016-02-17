@@ -1,35 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Library Finder</title>
-    <!-- Nurmalize.css for better browsers compatibility
+
+<head>
+  <meta charset="utf-8">
+  <title>Library Finder</title>
+  <!-- Nurmalize.css for better browsers compatibility
     https://necolas.github.io/normalize.css/ -->
-    <link rel="stylesheet" href="libs/normalize-css/normalize.css">
+  <link rel="stylesheet" href="libs/normalize-css/normalize.css">
 
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">\
+  <!-- Open Sans font -->
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
 
-    <!-- main stylesheet -->
-    <link rel="stylesheet" href="css/main.css">
-  </head>
-  <body>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
 
-    <div class="container">
-      <div class="jumbotron">
-        <h1>Hello</h1>
-        <h2>This is watch test</h2>
+  <!-- main stylesheet -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menuNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://omaralbeik.com">Library Finder</a>
       </div>
-
+      <div class="collapse navbar-collapse" id="menuNavbar">
+        <ul class="nav navbar-nav navbar-left">
+          <li class="active"><a href="#">All <span class="badge">12</span></a></li>
+          <li><a href="#">Saved <span class="badge">12</span></a></li>
+          <li><a href="#">Open Now <span class="badge">12</span></a></li>
+          <li><a href="#">Top 10</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Sign In</a></li>
+        </ul>
+      </div>
     </div>
+  </div>
 
-    <!-- ajax -->
-    <script type="text/javascript" src="libs/ajax/dist/ajax.min.js"></script>
+  <!-- ajax -->
+  <script type="text/javascript" src="libs/ajax/dist/ajax.min.js"></script>
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="libs/jquery/dist/jquery.js"></script>
+  <!-- jQuery -->
+  <script type="text/javascript" src="libs/jquery/dist/jquery.js"></script>
 
-    <!-- app.js is the main script -->
-    <script type="text/javascript" src="js/app.min.js"></script>
-  </body>
+  <!-- app.js is the main script -->
+  <script type="text/javascript" src="js/app.min.js"></script>
+
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
+
+</body>
+
 </html>

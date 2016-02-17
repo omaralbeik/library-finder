@@ -74,10 +74,6 @@ gulp.task('img', function() {
     .pipe(imagemin({
       progressive: true
     }))
-    .pipe(imageresize({
-      width: 960,
-      upscale: false
-    }))
     .pipe(gulp.dest(dest));
 });
 
@@ -88,9 +84,9 @@ gulp.task('serve', function() {
     }
   });
   gulp.watch('./src/**/*.html', ['html']);
-  gulp.watch('./src/**/*.js', ['scripts']);
-  gulp.watch('./src/**/*.css', ['styles']);
+  gulp.watch('./src/**/*.js', ['js']);
+  gulp.watch('./src/**/*.css', ['css']);
   gulp.watch('bower_components/**', ['bower']);
 });
 
-gulp.task('default', ['js', 'css', 'html', 'bower']);
+gulp.task('default', ['img', 'js', 'css', 'html', 'bower']);
