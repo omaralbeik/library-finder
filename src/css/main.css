@@ -2,33 +2,62 @@ html, body {
   height: 100%;
   font-family: 'Open Sans', sans-serif;
 }
-
 .navbar {
   font-size: 1.2em;
   font-weight: 200;
+  z-index: 2 !important
 }
-
 .navbar-brand {
   font-size: 1.2em;
   font-weight: 200;
 }
-
 .navbar .badge {
   background-color: red;
   margin-left: 6px;
   font-weight: 400;
 }
-
 .navbar input {
   margin-left: auto;
   margin-right: auto;
   max-width: 95%;
+  font-weight: 400;
+}
+#map {
+  height: 100%;
+  width: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1 !important
+}
+.pac-container {
+  margin-top: 10px;
+  min-width: 320px;
+  font-size: 1.2em;
+  -webkit-border-bottom-right-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.pac-item {
+  font-size: 0.9em;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+}
+.pac-item-query {
+  font-size: 0.9em;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
 }
 
-#map {
-    height: 100%;
-    width: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
+/* Extra small devices Phones (<768px) */
+
+@media only screen and (max-width: 768px) {
+  .pac-container {
+    margin-top: 1px;
+    max-width: 90%;
+    z-index: 1051 !important
+  }
 }

@@ -12,6 +12,9 @@
   <!-- ajax -->
   <script type="text/javascript" src="libs/ajax/dist/ajax.min.js"></script>
 
+  <!-- jQuery -->
+  <script type="text/javascript" src="libs/jquery/dist/jquery.js"></script>
+
   <!-- Nurmalize.css for better browsers compatibility
     https://necolas.github.io/normalize.css/ -->
   <link rel="stylesheet" href="libs/normalize-css/normalize.css">
@@ -45,18 +48,15 @@
       <div class="collapse navbar-collapse" id="menuNavbar">
 
         <form class="navbar-form navbar-left" role="search">
-                <div class="form-group">
-                  <div class="row">
-                    <input type="text" class="form-control" placeholder="Enter a city Name">
-                  </div>
-
-                </div>
-              </form>
+          <div class="form-group">
+            <input id="pac_input" type="text" class="form-control controls" placeholder="Search for a city" autocomplete="off">
+          </div>
+        </form>
 
         <ul class="nav navbar-nav navbar-left">
-          <li class="active"><a href="#">All <span class="badge">26</span></a></li>
+          <li class="active"><a href="#">All <!-- <span class="badge">8</span> --></a></li>
           <li><a href="#">Saved</a></li>
-          <li><a href="#">Open Now <span class="badge">8</span></a></li>
+          <li><a href="#">Open Now <!-- <span class="badge">8</span> --></a></li>
           <li><a href="#">Top 10</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -70,15 +70,14 @@
     <div id="map"></div>
   </div>
 
-  <!-- jQuery -->
-  <script type="text/javascript" src="libs/jquery/dist/jquery.js"></script>
-
   <!-- Bootstrap -->
   <script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
 
   <!-- Google Maps -->
-  <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfzyLeFjKiBUipjWUL2AGEyLhVl2QOroE&libraries=places"></script>
 
+  <script type="text/javascript" src='js/foursquare.min.js'></script>
+  <script type="text/javascript" src='js/google-maps.min.js'></script>
   <script type="text/javascript" src="js/app.min.js"></script>
 
 </body>
