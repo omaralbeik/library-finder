@@ -20,6 +20,7 @@
     "animate.css": "^3.5.1",
     "bootstrap": "^3.3.6",
     "firebase": "^2.4.0",
-    "normalize-css": "normalize.css#^3.0.3"
+    "normalize-css": "normalize.css#^3.0.3",
+    "knockout": "^3.4.0"
   }
 }

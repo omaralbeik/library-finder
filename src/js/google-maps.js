@@ -82,7 +82,7 @@ function addMarkerWithDelay(venue, delay) {
     });
     marker.addListener('click', function() {
       // infowindow.open(map, marker);
-      console.log(marker.title);
+      console.log(venue);
     });
     markers.push(marker);
 
