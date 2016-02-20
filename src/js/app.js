@@ -9,18 +9,16 @@ function AppViewModel() {
   // global variables
   var self = this;
 
-  var map, autocomplete;
+  var map, autocomplete, bounds;
   self.markers = Model.markers;
   self.total = ko.observable(0);
-
-  var bounds = new google.maps.LatLngBounds();
 
   /********************* Google Maps *********************/
 
   // Create a map object and specify the DOM element for display.
   self.initMap = function() {
 
-    // initail location for map
+    // initail location for map to Bahcesehir University
     var initLocation = {
       lat: 41.0417,
       lng: 29.0094
@@ -41,6 +39,7 @@ function AppViewModel() {
       self.markers[i].setMap(null);
     }
     self.markers = [];
+    self.total(0);
   };
 
   // addMarkerWithDelay function is used to to create a merker with delay
@@ -83,22 +82,18 @@ function AppViewModel() {
     autocomplete.addListener('place_changed', function() {
 
       self.clearMarkers();
-      self.total(0);
-
-      // hide navbar
-      if ($(window).width() < 768) {
-        $('.navbar-toggle').click();
-      }
 
       // get clicked place info from the autocomplete input
       var place = autocomplete.getPlace();
-      console.log(place.name);
+      var lat = place.geometry.location.lat();
+      var lng = place.geometry.location.lng();
+      var location = {lat: lat, lng: lng};
 
       // make sure that place has geometry infromation
       if (place.geometry) {
 
         // use foursquare API to check for libraries
-        self.searchVenues(place.name, function(data) {
+        self.searchVenues(location, function(data) {
 
           console.log(data);
 
@@ -136,13 +131,20 @@ function AppViewModel() {
           });
         });
       }
+      // if in mobile view; hide navbar after delay
+      //so user notices filters
+      window.setTimeout(function() {
 
+        if ($(window).width() < 768) {
+          $('.navbar-toggle').click();
+        }
+      }, 1500);
     });
   }(); // () used to run the function as sson as script is called
 
   /********************* Foursquare *********************/
 
-  self.searchVenues = function(city, callback) {
+  self.searchVenues = function(location, callback) {
     // list of allowed categories, for more info:
     // https://developer.foursquare.com/categorytree
     var categories = {
@@ -163,9 +165,9 @@ function AppViewModel() {
         client_id: clientId,
         client_secret: clientSecret,
         v: '20160230',
-        // section: 'arts',
         query: 'library',
-        near: city,
+        ll: location.lat + ',' + location.lng,
+        radius: 2500,
         limit: '100',
         categoryId: [categories.collegeLibrary]
       },
