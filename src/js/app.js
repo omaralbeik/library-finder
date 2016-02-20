@@ -13,6 +13,7 @@ function AppViewModel() {
   self.markers = Model.markers;
   self.total = ko.observable(0);
 
+  var bounds = new google.maps.LatLngBounds();
 
   /********************* Google Maps *********************/
 
@@ -35,10 +36,11 @@ function AppViewModel() {
 
   // clearMarkers function is used to delete all markers on map
   self.clearMarkers = function() {
+
     for (var i = 0; i < self.markers.length; i++) {
-      markers[i].setMap(null);
+      self.markers[i].setMap(null);
     }
-    markers = [];
+    self.markers = [];
   };
 
   // addMarkerWithDelay function is used to to create a merker with delay
@@ -58,7 +60,8 @@ function AppViewModel() {
         // infowindow.open(map, marker);
         console.log(venue);
       });
-      markers.push(marker);
+      self.markers.push(marker);
+      self.total(self.total() +1);
 
     }, delay);
   };
@@ -73,13 +76,14 @@ function AppViewModel() {
 
     var options = {
       // complete anly city names
-      types: ['(cities)']
+      // types: ['(cities)']
     };
 
     autocomplete = new google.maps.places.Autocomplete(input, options);
     autocomplete.addListener('place_changed', function() {
 
       self.clearMarkers();
+      self.total(0);
 
       // hide navbar
       if ($(window).width() < 768) {
@@ -93,19 +97,42 @@ function AppViewModel() {
       // make sure that place has geometry infromation
       if (place.geometry) {
 
-        // pan map to current place
-        map.panTo(place.geometry.location);
-        map.setZoom(12);
-
         // use foursquare API to check for libraries
         self.searchVenues(place.name, function(data) {
-          // get venues from parsed data
-          var venues = data.response.venues;
 
-          // add marker for each venue
-          $.each(venues, function(index, venue) {
+          console.log(data);
+
+          // resize map to fit all results
+          /************************************/
+
+          // create a new empty bounds
+          var bounds = new google.maps.LatLngBounds();
+
+          // get suggested bounds from foursquare
+          var suggestedBounds = data.response.suggestedBounds;
+
+          // get north east bounds from suggestedBounds
+          var ne = suggestedBounds.ne;
+
+          // get south west bounds from suggestedBounds
+          var sw = suggestedBounds.sw;
+
+          // extend bounds to fit ne and sw
+          bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
+          bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
+
+          // fit map to suggestedBounds
+          map.fitBounds(bounds);
+          /************************************/
+
+          // get items from parsed data
+          var items = data.response.groups[0].items;
+
+          // add marker for each item
+          $.each(items, function(index, item) {
+            var venue = item.venue;
             self.addMarkerWithDelay(venue, index * 50);
-            self.total(self.total() +1);
+            // self.total(self.total() +1);
           });
         });
       }
@@ -114,6 +141,7 @@ function AppViewModel() {
   }(); // () used to run the function as sson as script is called
 
   /********************* Foursquare *********************/
+
   self.searchVenues = function(city, callback) {
     // list of allowed categories, for more info:
     // https://developer.foursquare.com/categorytree
@@ -125,7 +153,7 @@ function AppViewModel() {
     var clientId = '05KBIJ3CKDQQUEQF14CJGLDP3D3P0X1ZIDL0AG5XHMKIX5AY';
     var clientSecret = 'GO4A1C0E1SI1RVFG20BT03D2YPITDSCTDMNPRDGYMAYLYJ4Y';
     var baseURL = 'https://api.foursquare.com/v2/';
-    var method = 'venues/search';
+    var method = 'venues/explore';
 
     $.ajax({
       url: baseURL + method,
@@ -135,9 +163,10 @@ function AppViewModel() {
         client_id: clientId,
         client_secret: clientSecret,
         v: '20160230',
+        // section: 'arts',
         query: 'library',
         near: city,
-        limit: '50',
+        limit: '100',
         categoryId: [categories.collegeLibrary]
       },
       success: callback
