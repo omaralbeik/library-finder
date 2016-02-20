@@ -1,5 +1,5 @@
-initMap();
-initSearch();
+// initMap();
+// initSearch();
 
 function hideNavBar() {
   if ($(window).width() < 768) {
