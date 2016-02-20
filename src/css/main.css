@@ -60,4 +60,9 @@ html, body {
     max-width: 60%;
     z-index: 1051 !important
   }
+
+  .navbar {
+    text-align: center;
+  }
+
 }

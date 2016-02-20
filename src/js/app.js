@@ -8,10 +8,31 @@ function AppViewModel() {
 
   // global variables
   var self = this;
-
   var map, autocomplete, bounds;
   self.markers = Model.markers;
-  self.total = ko.observable(0);
+
+  self.recommendLibraries = ko.observable(0);
+  self.openLibraries = ko.observable(0);
+
+  self.currentTab = ko.observable('recommended');
+
+  self.inSearch = ko.observable(false);
+
+  self.searchRecommended = function() {
+    console.log('should search recommended');
+    self.currentTab('recommended');
+  };
+
+  self.searchOpen = function() {
+    console.log('should search open');
+    self.currentTab('open');
+  };
+
+  self.searchTop = function() {
+    console.log('should search top');
+    self.currentTab('top');
+  };
+
 
   /********************* Google Maps *********************/
 
@@ -30,7 +51,7 @@ function AppViewModel() {
       scrollwheel: true,
       zoom: 12
     });
-  }(); // () used to run the function as sson as script is called
+  }(); // () used to run the function as soon as script is called
 
   // clearMarkers function is used to delete all markers on map
   self.clearMarkers = function() {
@@ -39,10 +60,11 @@ function AppViewModel() {
       self.markers[i].setMap(null);
     }
     self.markers = [];
-    self.total(0);
+    self.recommendLibraries(0);
+    self.openLibraries(0);
   };
 
-  // addMarkerWithDelay function is used to to create a merker with delay
+  // addMarkerWithDelay function is used to create a merker with delay
   self.addMarkerWithDelay = function(venue, delay) {
     window.setTimeout(function() {
       var marker = new google.maps.Marker({
@@ -60,7 +82,11 @@ function AppViewModel() {
         console.log(venue);
       });
       self.markers.push(marker);
-      self.total(self.total() +1);
+      if (self.currentTab() === 'recommended') {
+        self.recommendLibraries(self.recommendLibraries() + 1);
+      } else if (self.currentTab() === 'open') {
+        self.openLibraries(self.openLibraries() + 1);
+      }
 
     }, delay);
   };
@@ -70,7 +96,7 @@ function AppViewModel() {
   // initialize autocompletion text input
   self.initSearch = function() {
 
-    var input = document.getElementById('pac_input');
+    var input = document.getElementById('input');
     var searchBox = new google.maps.places.SearchBox(input);
 
     var options = {
@@ -87,50 +113,18 @@ function AppViewModel() {
       var place = autocomplete.getPlace();
       var lat = place.geometry.location.lat();
       var lng = place.geometry.location.lng();
-      var location = {lat: lat, lng: lng};
+      var location = {
+        lat: lat,
+        lng: lng
+      };
 
       // make sure that place has geometry infromation
       if (place.geometry) {
 
         // use foursquare API to check for libraries
-        self.searchVenues(location, function(data) {
-
-          console.log(data);
-
-          // resize map to fit all results
-          /************************************/
-
-          // create a new empty bounds
-          var bounds = new google.maps.LatLngBounds();
-
-          // get suggested bounds from foursquare
-          var suggestedBounds = data.response.suggestedBounds;
-
-          // get north east bounds from suggestedBounds
-          var ne = suggestedBounds.ne;
-
-          // get south west bounds from suggestedBounds
-          var sw = suggestedBounds.sw;
-
-          // extend bounds to fit ne and sw
-          bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
-          bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
-
-          // fit map to suggestedBounds
-          map.fitBounds(bounds);
-          /************************************/
-
-          // get items from parsed data
-          var items = data.response.groups[0].items;
-
-          // add marker for each item
-          $.each(items, function(index, item) {
-            var venue = item.venue;
-            self.addMarkerWithDelay(venue, index * 50);
-            // self.total(self.total() +1);
-          });
-        });
+        self.searchVenues(location, self.currentTab(), self.searchLibraries);
       }
+
       // if in mobile view; hide navbar after delay
       //so user notices filters
       window.setTimeout(function() {
@@ -140,11 +134,49 @@ function AppViewModel() {
         }
       }, 1500);
     });
-  }(); // () used to run the function as sson as script is called
+  }(); // () used to run the function as soon as script is called
+
+
+  self.searchLibraries = function(data) {
+
+    // console.log(data);
+
+    // resize map to fit all results
+    /************************************/
+
+    // create a new empty bounds
+    var bounds = new google.maps.LatLngBounds();
+
+    // get suggested bounds from foursquare
+    var suggestedBounds = data.response.suggestedBounds;
+
+    // get north east bounds from suggestedBounds
+    var ne = suggestedBounds.ne;
+
+    // get south west bounds from suggestedBounds
+    var sw = suggestedBounds.sw;
+
+    // extend bounds to fit ne and sw
+    bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
+    bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
+
+    // fit map to suggestedBounds
+    map.fitBounds(bounds);
+    /************************************/
+
+    // get items from parsed data
+    var items = data.response.groups[0].items;
+
+    // add marker for each item
+    $.each(items, function(index, item) {
+      var venue = item.venue;
+      self.addMarkerWithDelay(venue, index * 50);
+    });
+  };
 
   /********************* Foursquare *********************/
 
-  self.searchVenues = function(location, callback) {
+  self.searchVenues = function(location, options, callback) {
     // list of allowed categories, for more info:
     // https://developer.foursquare.com/categorytree
     var categories = {
@@ -157,20 +189,27 @@ function AppViewModel() {
     var baseURL = 'https://api.foursquare.com/v2/';
     var method = 'venues/explore';
 
+    var ajaxData = {
+      client_id: clientId,
+      client_secret: clientSecret,
+      v: '20160230',
+      query: 'library',
+      ll: location.lat + ',' + location.lng,
+      limit: '100',
+      categoryId: [categories.collegeLibrary]
+    };
+
+    if (options === open) {
+      ajaxData.openNow = true;
+    } else if (options === top) {
+      ajaxData.limit = 10;
+    }
+
     $.ajax({
       url: baseURL + method,
       type: 'GET',
       dataType: 'json',
-      data: {
-        client_id: clientId,
-        client_secret: clientSecret,
-        v: '20160230',
-        query: 'library',
-        ll: location.lat + ',' + location.lng,
-        radius: 2500,
-        limit: '100',
-        categoryId: [categories.collegeLibrary]
-      },
+      data: ajaxData,
       success: callback
     });
   };

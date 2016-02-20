@@ -50,16 +50,12 @@
 
       <div class="collapse navbar-collapse" id="menuNavbar">
         <form class="navbar-form navbar-left" role="search">
-            <input id="pac_input" type="text" class="form-control controls" placeholder="Search for libraries" autocomplete="off">
+            <input id="input" type="text" class="form-control controls" placeholder="Search for libraries" autocomplete="off">
         </form>
         <ul class="nav navbar-nav navbar-left">
-          <li class="active" data-bind="visible: total"><a href="#">Recommended <span class="badge" data-bind="text: total, visible: total"></span></a></li>
-          <li><a href="#" data-bind="visible: total">Saved</a></li>
-          <li><a href="#" data-bind="visible: total">Open Now <!-- <span class="badge">8</span> --></a></li>
-          <li><a href="#" data-bind="visible: total">Top 10</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#">Sign In</a></li>
+          <li data-bind="css: {'active' : currentTab() === 'recommended', 'disabled': inSearch()}"><a href="#" data-bind="click: searchRecommended">Recommended <span class="badge" data-bind="text: recommendLibraries, visible: recommendLibraries"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'open', 'disabled': inSearch()}"><a href="#" data-bind="click: searchOpen">Open Now <span class="badge" data-bind="visible: openLibraries">8</span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'top', 'disabled': inSearch()}"><a href="#" data-bind="click: searchTop">Top 10</a></li>
         </ul>
       </div>
     </div>
