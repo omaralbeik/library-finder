@@ -1,6 +1,23 @@
 // Model
 var Model = {
-  markers: []
+
+  library: {
+    name: "",
+    id: "",
+    location: {
+      lat: 0,
+      lng: 0
+    },
+    adress: {
+      adress: "",
+      city: "",
+      country: ""
+    },
+    rating: 0,
+    url: "",
+    images: [],
+    mapMarker: null
+  }
 };
 
 // AppViewModel
@@ -9,14 +26,12 @@ function AppViewModel() {
   // global variables
   var self = this;
   var map, autocomplete, bounds;
-  self.markers = Model.markers;
-
-  self.recommendLibraries = ko.observable(0);
-  self.openLibraries = ko.observable(0);
+  self.libraries = ko.observableArray();
 
   self.currentTab = ko.observable('recommended');
 
   self.inSearch = ko.observable(false);
+
 
   self.searchRecommended = function() {
     console.log('should search recommended');
@@ -56,7 +71,7 @@ function AppViewModel() {
   // clearMarkers function is used to delete all markers on map
   self.clearMarkers = function() {
 
-    for (var i = 0; i < self.markers.length; i++) {
+    for (var i = 0; i < self.libraries.length; i++) {
       self.markers[i].setMap(null);
     }
     self.markers = [];
@@ -139,7 +154,7 @@ function AppViewModel() {
 
   self.searchLibraries = function(data) {
 
-    // console.log(data);
+    console.log(data);
 
     // resize map to fit all results
     /************************************/
@@ -168,11 +183,13 @@ function AppViewModel() {
     var items = data.response.groups[0].items;
 
     // add marker for each item
+
     $.each(items, function(index, item) {
       var venue = item.venue;
       self.addMarkerWithDelay(venue, index * 50);
     });
-  };
+    self.inSearch(false);
+};
 
   /********************* Foursquare *********************/
 
@@ -183,6 +200,8 @@ function AppViewModel() {
       library: '4bf58dd8d48988d12f941735',
       collegeLibrary: '4bf58dd8d48988d1a7941735'
     };
+
+    self.inSearch(true);
 
     var clientId = '05KBIJ3CKDQQUEQF14CJGLDP3D3P0X1ZIDL0AG5XHMKIX5AY';
     var clientSecret = 'GO4A1C0E1SI1RVFG20BT03D2YPITDSCTDMNPRDGYMAYLYJ4Y';
