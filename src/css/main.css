@@ -8,15 +8,6 @@ html, body {
   z-index: 2 !important;
 }
 
-.labels {
-    color: white;
-    background-color: red;
-    font-size: 13px;
-    text-align: center;
-    width: 20px;
-    white-space: nowrap;
-}
-
 .navbar-form {
   padding-left: 0;
   padding-right: 2px;
@@ -43,7 +34,7 @@ html, body {
   width: 100%;
   left: 0;
   position: absolute;
-  top: 0;
+  top: 50px;
   z-index: 1 !important
 }
 .pac-container {
