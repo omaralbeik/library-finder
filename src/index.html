@@ -50,7 +50,7 @@
 
       <div class="collapse navbar-collapse" id="menuNavbar">
         <form class="navbar-form navbar-left" role="search">
-            <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off">
+          <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off">
         </form>
         <ul class="nav navbar-nav navbar-left">
           <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended">Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
@@ -70,6 +70,7 @@
 
   <!-- Google Maps -->
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfzyLeFjKiBUipjWUL2AGEyLhVl2QOroE&libraries=places"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
 
   <!-- knockout -->
   <script type="text/javascript" src="libs/knockout/dist/knockout.js"></script>

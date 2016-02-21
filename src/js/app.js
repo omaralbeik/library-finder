@@ -77,24 +77,36 @@ function AppViewModel() {
   };
 
   // addMarkerWithDelay function is used to create a merker with delay
-  self.addMarkerWithDelay = function(library, delay) {
+  self.addMarkerWithDelay = function(library, number, delay) {
 
     window.setTimeout(function() {
+
+      var icon;
+
+      if (self.currentTab() === 'top') {
+        icon = 'img/markers/marker' + number + '.png';
+      } else {
+        icon = 'img/markers/marker.png';
+      }
+
       var marker = new google.maps.Marker({
         map: map,
         draggable: false,
         title: library().name().name,
         animation: google.maps.Animation.DROP,
+        icon: icon,
         position: {
           lat: library().lat(),
           lng: library().lng()
         }
       });
 
+
+
       var infowindow = new google.maps.InfoWindow({
-          content: self.generateInfoString(library),
-          maxWidth: 260
-        });
+        content: self.generateInfoString(library),
+        maxWidth: 260
+      });
 
       marker.addListener('click', function() {
         infowindow.open(map, marker);
@@ -181,6 +193,7 @@ function AppViewModel() {
       query: 'library',
       ll: self.currentPlace().geometry.location.lat() + ',' + self.currentPlace().geometry.location.lng(),
       limit: '50',
+      sort: 'popular',
       categoryId: [categories.collegeLibrary]
     };
 
@@ -228,6 +241,8 @@ function AppViewModel() {
 
         var delay = 50;
 
+        console.log(self.currentTab());
+
         // create a Library item for each item, and push it to libraries array
         $.each(items, function(index, item) {
           var venue = item.venue;
@@ -241,13 +256,18 @@ function AppViewModel() {
           library().rating(venue.rating);
           library().url(venue.url);
 
-          self.addMarkerWithDelay(library, index * delay);
+          if (self.currentTab() == 'top') {
+            // console.log(index.toString());
+            self.addMarkerWithDelay(library, (index + 1).toString(), index * delay);
+          } else {
+            self.addMarkerWithDelay(library, "", index * delay);
+          }
 
           setTimeout(function() {
             self.inSearch(false);
           }, items.length * delay);
 
-          setTimeout(function(){
+          setTimeout(function() {
             self.libraries.push(library);
           }, index * delay);
 

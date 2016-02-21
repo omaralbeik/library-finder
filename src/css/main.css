@@ -8,6 +8,15 @@ html, body {
   z-index: 2 !important;
 }
 
+.labels {
+    color: white;
+    background-color: red;
+    font-size: 13px;
+    text-align: center;
+    width: 20px;
+    white-space: nowrap;
+}
+
 .navbar-form {
   padding-left: 0;
   padding-right: 2px;
