@@ -145,7 +145,10 @@ function AppViewModel() {
   self.searchLibraries = function() {
 
     // first things first, delete any old markers
-    self.clearMarkers()
+    self.clearMarkers();
+
+    // set inSearch to true
+    self.inSearch(true);
 
     console.log('searchLibraries | ' + self.currentTab());
 
@@ -229,7 +232,12 @@ function AppViewModel() {
 
           self.addMarkerWithDelay(library, index * 50);
 
+          setTimeout(function() {
+            self.inSearch(false);
+          }, items.length * 50);
+
           self.libraries.push(library);
+
         });
 
         console.log(self.libraries().length);

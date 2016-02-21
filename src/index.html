@@ -53,9 +53,9 @@
             <input id="input" type="text" class="form-control controls" placeholder="Search for libraries" autocomplete="off">
         </form>
         <ul class="nav navbar-nav navbar-left">
-          <li data-bind="css: {'active' : currentTab() === 'recommended', 'disabled': inSearch()}"><a href="#" data-bind="click: searchRecommended">Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'open', 'disabled': inSearch()}"><a href="#" data-bind="click: searchOpen">Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'top', 'disabled': inSearch()}"><a href="#" data-bind="click: searchTop">Top 10</a></li>
+          <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended">Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'open'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchOpen">Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'top'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchTop">Top 10</a></li>
         </ul>
       </div>
     </div>
