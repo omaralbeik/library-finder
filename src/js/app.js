@@ -9,15 +9,12 @@ var Library = function() {
   self.lng = ko.observable();
 
   self.address = ko.observable();
-  self.city = ko.observable();
-  self.country = ko.observable();
 
   self.rating = ko.observable();
   self.url = ko.observable();
   self.images = ko.observableArray();
 
   self.mapMarker = ko.observable();
-
 };
 
 // AppViewModel
@@ -37,19 +34,16 @@ function AppViewModel() {
 
   self.searchRecommended = function() {
     self.currentTab('recommended');
-    console.log('currentTab changed to recommended');
     self.searchLibraries();
   };
 
   self.searchOpen = function() {
     self.currentTab('open');
-    console.log('currentTab changed to open');
     self.searchLibraries();
   };
 
   self.searchTop = function() {
     self.currentTab('top');
-    console.log('currentTab changed to top');
     self.searchLibraries();
   };
 
@@ -96,8 +90,14 @@ function AppViewModel() {
           lng: library().lng()
         }
       });
+
+      var infowindow = new google.maps.InfoWindow({
+          content: self.generateInfoString(library),
+          maxWidth: 260
+        });
+
       marker.addListener('click', function() {
-        console.log(library().name());
+        infowindow.open(map, marker);
       });
       library().mapMarker(marker);
     }, delay);
@@ -140,6 +140,18 @@ function AppViewModel() {
   }(); // () used to run the function as soon as script is called
 
 
+  // FIXME: design the window
+  self.generateInfoString = function(library) {
+    var info = info_name.replace('%name%', library().name());
+
+    if (library().address() !== undefined && library().address() !== null) {
+      info += info_address.replace('%address%', library().address());
+    }
+    return info;
+
+  };
+
+
   /********************* Foursquare *********************/
 
   self.searchLibraries = function() {
@@ -149,9 +161,6 @@ function AppViewModel() {
 
     // set inSearch to true
     self.inSearch(true);
-
-    console.log('searchLibraries | ' + self.currentTab());
-
 
     var categories = {
       // list of allowed categories, for more info:
@@ -171,7 +180,7 @@ function AppViewModel() {
       v: '20160230',
       query: 'library',
       ll: self.currentPlace().geometry.location.lat() + ',' + self.currentPlace().geometry.location.lng(),
-      limit: '100',
+      limit: '50',
       categoryId: [categories.collegeLibrary]
     };
 
@@ -187,7 +196,7 @@ function AppViewModel() {
       dataType: 'json',
       data: ajaxData,
       success: function(data) {
-        console.log(data);
+        // console.log(data);
 
         // resize map to fit all results
         /************************************/
@@ -215,6 +224,10 @@ function AppViewModel() {
         //     // get items from parsed data
         var items = data.response.groups[0].items;
 
+        // console.log(items);
+
+        var delay = 50;
+
         // create a Library item for each item, and push it to libraries array
         $.each(items, function(index, item) {
           var venue = item.venue;
@@ -224,19 +237,19 @@ function AppViewModel() {
           library().id(venue.id);
           library().lat(venue.location.lat);
           library().lng(venue.location.lng);
-          library().address(venue.location.adress);
-          library().city(venue.location.city);
-          library().country(venue.location.country);
+          library().address(venue.location.address);
           library().rating(venue.rating);
           library().url(venue.url);
 
-          self.addMarkerWithDelay(library, index * 50);
+          self.addMarkerWithDelay(library, index * delay);
 
           setTimeout(function() {
             self.inSearch(false);
-          }, items.length * 50);
+          }, items.length * delay);
 
-          self.libraries.push(library);
+          setTimeout(function(){
+            self.libraries.push(library);
+          }, index * delay);
 
         });
 
@@ -246,23 +259,6 @@ function AppViewModel() {
     });
 
   };
-
-
-  //   self.searchLibraries = function(data) {
-  //
-  //     console.log(data);
-  //
-  //     // get items from parsed data
-  //     var items = data.response.groups[0].items;
-  //
-  //     // add marker for each item
-  //
-  //     $.each(items, function(index, item) {
-  //       var venue = item.venue;
-  //       self.addMarkerWithDelay(venue, index * 50);
-  //     });
-  //     self.inSearch(false);
-  // };
 }
 
 
