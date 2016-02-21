@@ -38,6 +38,7 @@
   <!-- Navigation -->
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
+
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menuNavbar">
           <span class="icon-bar"></span>
@@ -46,22 +47,15 @@
         </button>
         <a class="navbar-brand" href="#"><i class="fa fa-book"></i> Library Finder</a>
       </div>
+
       <div class="collapse navbar-collapse" id="menuNavbar">
-
         <form class="navbar-form navbar-left" role="search">
-          <div class="form-group">
-            <input id="pac_input" type="text" class="form-control controls" placeholder="Search for a city" autocomplete="off">
-          </div>
+            <input id="input" type="text" class="form-control controls" placeholder="Search for libraries" autocomplete="off">
         </form>
-
         <ul class="nav navbar-nav navbar-left">
-          <li class="active"><a href="#">All <span class="badge"></span></a></li>
-          <li><a href="#">Saved</a></li>
-          <li><a href="#">Open Now <!-- <span class="badge">8</span> --></a></li>
-          <li><a href="#">Top 10</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#">Sign In</a></li>
+          <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended">Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'open'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchOpen">Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'top'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchTop">Top 10</a></li>
         </ul>
       </div>
     </div>
@@ -79,9 +73,6 @@
 
   <!-- knockout -->
   <script type="text/javascript" src="libs/knockout/dist/knockout.js"></script>
-
-  <script type="text/javascript" src='js/foursquare.min.js'></script>
-  <script type="text/javascript" src='js/google-maps.min.js'></script>
   <script type="text/javascript" src="js/app.min.js"></script>
 
 </body>

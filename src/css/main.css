@@ -57,7 +57,12 @@ html, body {
 @media only screen and (max-width: 768px) {
   .pac-container {
     margin-top: 1px;
-    max-width: 90%;
+    max-width: 60%;
     z-index: 1051 !important
   }
+
+  .navbar {
+    text-align: center;
+  }
+
 }
