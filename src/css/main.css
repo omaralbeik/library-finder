@@ -25,8 +25,8 @@ html, body {
 .navbar input {
   margin-left: auto;
   margin-right: auto;
-  max-width: 95%;
-  min-width: 350px;
+  max-width: 90%;
+  min-width: 320px;
   font-weight: 400;
 }
 #map {
@@ -78,6 +78,10 @@ html, body {
     margin-top: 1px;
     max-width: 95%;
     z-index: 1051 !important
+  }
+
+  .form-control-feedback {
+    margin-right: 30px;
   }
 
   .navbar {

@@ -426,6 +426,9 @@ function AppViewModel() {
     }
   };
 
+  // add clear button to input
+  $("#input").addClear();
+
 }
 
 // Activates knockout.js

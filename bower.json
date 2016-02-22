@@ -21,6 +21,7 @@
     "bootstrap": "^3.3.6",
     "firebase": "^2.4.0",
     "normalize-css": "normalize.css#^3.0.3",
-    "knockout": "^3.4.0"
+    "knockout": "^3.4.0",
+    "bootstrap-add-clear": "^1.0.2"
   }
 }
