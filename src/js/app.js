@@ -234,7 +234,20 @@ function AppViewModel() {
       dataType: 'json',
       data: ajaxData,
       success: function(data) {
-        // console.log(data);
+
+        if (data.response.totalResults < 1) {
+          var message;
+          if (self.currentTab() === 'open') {
+            message = 'No libraries is open now in ' + self.currentPlace().name;
+          } else {
+            message = 'No libraries found in ' + self.currentPlace().name;
+          }
+          self.inSearch(false);
+          alert(message);
+          return;
+        }
+
+        console.log(data);
 
         // resize map to fit all results
         /************************************/
@@ -296,6 +309,9 @@ function AppViewModel() {
           }, index * delay);
 
         });
+      },
+      fail: function(data) {
+        console.log(data);
       }
     });
 
