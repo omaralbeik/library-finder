@@ -10,6 +10,8 @@ var Library = function() {
   this.address = ko.observable();
 
   this.rating = ko.observable();
+  this.ratingColor = ko.observable();
+  this.usersCount = ko.observable();
   this.url = ko.observable();
   this.images = ko.observableArray();
 
@@ -176,6 +178,11 @@ function AppViewModel() {
     if (library().address() !== undefined && library().address() !== null) {
       info += info_address.replace('%address%', library().address());
     }
+
+    if (library().rating() !== undefined && library().rating() !== null) {
+      info += info_rating.replace('%rating%', library().rating()).replace('%color%', library().ratingColor()).replace('%users%', library().usersCount());
+    }
+
     return info;
 
   };
@@ -233,6 +240,7 @@ function AppViewModel() {
       type: 'GET',
       dataType: 'json',
       data: ajaxData,
+      timeout: 7000, // set request timeout to 7 seconds
       success: function(data) {
 
         if (data.response.totalResults < 1) {
@@ -291,7 +299,9 @@ function AppViewModel() {
           library().lng(venue.location.lng);
           library().address(venue.location.address);
           library().rating(venue.rating);
+          library().ratingColor(venue.ratingColor);
           library().url(venue.url);
+          library().usersCount(venue.stats.usersCount);
 
           if (self.currentTab() == 'top') {
             // console.log(index.toString());
@@ -310,8 +320,21 @@ function AppViewModel() {
 
         });
       },
-      fail: function(data) {
-        console.log(data);
+      fail: function(error) {
+        console.log(error);
+      },
+      error: function(error) {
+
+        // console.log(error);
+        var errorString;
+
+        if (error.status === 0) {
+          errorString = "the request timed out please try again.";
+        } else {
+          errorString = error.statusText;
+        }
+
+        alert(errorString);
       }
     });
 
@@ -352,7 +375,7 @@ function AppViewModel() {
       // check if device is mobile first
       hideNavBar();
     });
-  }();  // () used to run the function as soon as script is called
+  }(); // () used to run the function as soon as script is called
 
 }
 
