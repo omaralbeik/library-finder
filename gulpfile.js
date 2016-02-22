@@ -10,6 +10,8 @@ var imagemin = require('gulp-imagemin');
 var htmlmin = require('gulp-htmlmin');
 var jsmin = require('gulp-jsmin');
 var rename = require('gulp-rename');
+var uglify = require('gulp-uglify');
+var gzip = require('gulp-gzip');
 
 var dest = 'dist/';
 
@@ -23,10 +25,28 @@ gulp.task('bower', function() {
             './dist/css/*.min.*',
             './dist/fonts/*.*'
           ]
+        },
+        jquery: {
+          main: [
+            './dist/*.min.*',
+          ]
+        },
+        'bootstrap-add-clear': {
+          main: [
+            '*.min.*',
+          ]
         }
       }
     }))
     .pipe(gulp.dest(dest + 'libs'));
+});
+
+gulp.task('gzip', function() {
+  gulp.src('./src/**/*.*')
+    .pipe(gzip({
+      append: true
+    }))
+    .pipe(gulp.dest(dest));
 });
 
 gulp.task('html', function() {
@@ -43,15 +63,16 @@ gulp.task('html', function() {
 gulp.task('js', function() {
   gulp.src('./src/**/*.js')
     // comment the next line to disbale maping js files
-    .pipe(sourcemaps.init({
-      loadMaps: true
-    }))
+    // .pipe(sourcemaps.init({
+    //   loadMaps: true
+    // }))
     .pipe(jsmin())
+    .pipe(uglify())
     .pipe(rename({
       suffix: '.min'
     }))
     // comment the next line to disbale maping js files
-    .pipe(sourcemaps.write())
+    // .pipe(sourcemaps.write())
     .pipe(gulp.dest(dest))
     .pipe(reload({
       stream: true
@@ -63,6 +84,9 @@ gulp.task('css', function() {
     .pipe(sourcemaps.init())
     .pipe(cssnano())
     .pipe(sourcemaps.write('.'))
+    .pipe(rename({
+      suffix: '.min'
+    }))
     .pipe(gulp.dest(dest))
     .pipe(reload({
       stream: true
@@ -90,4 +114,4 @@ gulp.task('serve', function() {
   gulp.watch('bower_components/**', ['bower']);
 });
 
-gulp.task('default', ['img', 'js', 'css', 'html', 'bower']);
+gulp.task('default', ['img', 'js', 'css', 'html', 'bower', 'gzip']);
