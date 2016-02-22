@@ -10,7 +10,7 @@ html, body {
 
 .navbar-form {
   padding-left: 0;
-  padding-right: 2px;
+  padding-right: 10px;
 }
 
 .navbar-brand {
@@ -59,12 +59,24 @@ html, body {
   font-weight: 700;
 }
 
+.info_contact {
+  list-style: none;
+  padding-left: 0;
+}
+
+.info_contact li {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+
 /* Extra small devices Phones (<768px) */
 
 @media only screen and (max-width: 768px) {
   .pac-container {
     margin-top: 1px;
-    max-width: 65%;
+    max-width: 95%;
     z-index: 1051 !important
   }
 

@@ -3,7 +3,6 @@ var Library = function() {
 
   this.name = ko.observable();
   this.id = ko.observable();
-
   this.lat = ko.observable();
   this.lng = ko.observable();
 
@@ -12,7 +11,10 @@ var Library = function() {
   this.rating = ko.observable();
   this.ratingColor = ko.observable();
   this.usersCount = ko.observable();
+  this.contact = ko.observable();
+
   this.url = ko.observable();
+
   this.images = ko.observableArray();
 
   this.mapMarker = ko.observable();
@@ -183,8 +185,33 @@ function AppViewModel() {
       info += info_rating.replace('%rating%', library().rating()).replace('%color%', library().ratingColor()).replace('%users%', library().usersCount());
     }
 
-    return info;
+    var contact = $(info_contact);
 
+    if (library().url() !== undefined && library().url() !== null) {
+      contact.append(info_url.replace('%url%', library().url()));
+    }
+
+    if (library().contact().phone !== undefined && library().contact().phone !== null) {
+      contact.append(info_phone.replace('%phone%', library().contact().phone));
+    }
+
+    if (library().contact().facebook !== undefined && library().contact().facebook !== null) {
+      contact.append(info_facebook.replace('%id%', library().contact().facebook));
+    }
+
+    if (library().contact().twitter !== undefined && library().contact().twitter !== null) {
+      contact.append(info_twitter.replace('%name%', library().contact().twitter));
+    }
+
+    if (library().id() !== undefined && library().id() !== null) {
+      contact.append(info_foursquare.replace('%id%', library().id()));
+    }
+
+
+    var container = $(info_contact_container);
+    container.append(contact);
+
+    return info + container.html();
   };
 
 
@@ -197,6 +224,7 @@ function AppViewModel() {
 
     // set inSearch to true
     self.inSearch(true);
+    self.setTabLoading(true);
 
     var categories = {
       // list of allowed categories, for more info:
@@ -246,11 +274,12 @@ function AppViewModel() {
         if (data.response.totalResults < 1) {
           var message;
           if (self.currentTab() === 'open') {
-            message = 'No libraries is open now in ' + self.currentPlace().name;
+            message = 'No libraries is open now near ' + self.currentPlace().name;
           } else {
-            message = 'No libraries found in ' + self.currentPlace().name;
+            message = 'No libraries found near ' + self.currentPlace().name;
           }
           self.inSearch(false);
+          self.setTabLoading(false);
           alert(message);
           return;
         }
@@ -300,6 +329,7 @@ function AppViewModel() {
           library().address(venue.location.address);
           library().rating(venue.rating);
           library().ratingColor(venue.ratingColor);
+          library().contact(venue.contact);
           library().url(venue.url);
           library().usersCount(venue.stats.usersCount);
 
@@ -312,6 +342,8 @@ function AppViewModel() {
 
           setTimeout(function() {
             self.inSearch(false);
+            self.setTabLoading(false);
+            self.hideNavBar();
           }, items.length * delay);
 
           setTimeout(function() {
@@ -321,9 +353,16 @@ function AppViewModel() {
         });
       },
       fail: function(error) {
+        self.inSearch(false);
+        self.setTabLoading(false);
+        self.hideNavBar();
         console.log(error);
       },
       error: function(error) {
+
+        self.inSearch(false);
+        self.setTabLoading(false);
+        self.hideNavBar();
 
         // console.log(error);
         var errorString;
@@ -363,19 +402,29 @@ function AppViewModel() {
     return true;
   };
 
-  self.initNavbar = function() {
-    function hideNavBar() {
-      if ($(window).width() < 768) {
-        $('.navbar-toggle').click();
-      }
-    }
+  self.setTabLoading = function(loading) {
 
-    // hide navbar after a link is clicked
-    $('.nav a').on('click', function() {
-      // check if device is mobile first
-      hideNavBar();
-    });
-  }(); // () used to run the function as soon as script is called
+    if (loading) {
+      if (self.currentTab() === 'recommended') {
+        $('#recommended-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+      }
+      if (self.currentTab() === 'open') {
+        $('#open-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+      }
+      if (self.currentTab() === 'top') {
+        $('#top-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+      }
+    } else {
+      $('i.fa-spin').remove();
+    }
+  };
+
+  // helper methode to hide navbar in mobile view
+  self.hideNavBar = function() {
+    if ($(window).width() < 768) {
+      $('.navbar-toggle').click();
+    }
+  };
 
 }
 

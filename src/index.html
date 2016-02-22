@@ -63,9 +63,9 @@
           <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-toggle="popover" data-placement="bottom" title="No place found!" data-content="Please try another search term, or enter more specific address">
         </form>
         <ul class="nav navbar-nav navbar-left">
-          <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended">Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'open'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchOpen">Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'top'}"><a href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchTop">Top 10</a></li>
+          <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a id="recommended-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended"> Recommended <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'open'}"><a id="open-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchOpen"> Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
+          <li data-bind="css: {'active' : currentTab() == 'top'}"><a id="top-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchTop"> Top 10</a></li>
         </ul>
       </div>
     </div>

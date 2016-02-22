@@ -86,6 +86,7 @@ gulp.task('serve', function() {
   gulp.watch('./src/**/*.html', ['html']);
   gulp.watch('./src/**/*.js', ['js']);
   gulp.watch('./src/**/*.css', ['css']);
+  gulp.watch('./src/img/**', ['img']);
   gulp.watch('bower_components/**', ['bower']);
 });
 
