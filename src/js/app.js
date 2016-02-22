@@ -1,20 +1,19 @@
 // Model
 var Library = function() {
-  var self = this;
 
-  self.name = ko.observable();
-  self.id = ko.observable();
+  this.name = ko.observable();
+  this.id = ko.observable();
 
-  self.lat = ko.observable();
-  self.lng = ko.observable();
+  this.lat = ko.observable();
+  this.lng = ko.observable();
 
-  self.address = ko.observable();
+  this.address = ko.observable();
 
-  self.rating = ko.observable();
-  self.url = ko.observable();
-  self.images = ko.observableArray();
+  this.rating = ko.observable();
+  this.url = ko.observable();
+  this.images = ko.observableArray();
 
-  self.mapMarker = ko.observable();
+  this.mapMarker = ko.observable();
 };
 
 // AppViewModel
@@ -23,28 +22,41 @@ function AppViewModel() {
   // global variables
   var self = this;
   var map, autocomplete, bounds;
+
   self.libraries = ko.observableArray();
 
-  self.currentLibrary = ko.observable(new Library());
+  // self.currentLibrary = ko.observable(new Library());
 
   self.currentTab = ko.observable('recommended');
+  self.currentPlace = ko.observable();
   self.inSearch = ko.observable(false);
 
-  self.currentPlace = ko.observable();
 
   self.searchRecommended = function() {
     self.currentTab('recommended');
-    self.searchLibraries();
+    if (self.isCurrentPlaceAvailable()) {
+      self.searchLibraries();
+    } else {
+      self.showNoPlaceFoundPopover(true);
+    }
   };
 
   self.searchOpen = function() {
     self.currentTab('open');
-    self.searchLibraries();
+    if (self.isCurrentPlaceAvailable()) {
+      self.searchLibraries();
+    } else {
+      self.showNoPlaceFoundPopover(true);
+    }
   };
 
   self.searchTop = function() {
     self.currentTab('top');
-    self.searchLibraries();
+    if (self.isCurrentPlaceAvailable()) {
+      self.searchLibraries();
+    } else {
+      self.showNoPlaceFoundPopover(true);
+    }
   };
 
 
@@ -53,7 +65,7 @@ function AppViewModel() {
   // Create a map object and specify the DOM element for display.
   self.initMap = function() {
 
-    // initail location for map to Bahçeşehir University, Istanbul
+    // initial location for map to Bahçeşehir University, Istanbul
     var initLocation = {
       lat: 41.0417,
       lng: 29.0094
@@ -115,7 +127,36 @@ function AppViewModel() {
     }, delay);
   };
 
+
   /********************* Google Places *********************/
+
+  // this function gets place information from input and assign it back to
+  // global variable currentPlace
+  self.getPlaceFromInput = function() {
+    self.clearMarkers();
+
+    // get clicked place info from the autocomplete input
+    self.currentPlace(self.autocomplete.getPlace());
+
+    // make sure that place has geometry infromation
+    if (self.currentPlace().geometry) {
+
+      self.showNoPlaceFoundPopover(false);
+
+      // use foursquare API to check for libraries
+      self.searchLibraries();
+    } else {
+      self.showNoPlaceFoundPopover(true);
+    }
+
+    // if in mobile view; hide navbar after delay
+    //so user notices filters changes
+    window.setTimeout(function() {
+      if ($(window).width() < 768) {
+        $('.navbar-toggle').click();
+      }
+    }, 1500);
+  };
 
   // initialize autocompletion text input
   self.initSearch = function() {
@@ -123,32 +164,8 @@ function AppViewModel() {
     var input = document.getElementById('input');
     var searchBox = new google.maps.places.SearchBox(input);
 
-    autocomplete = new google.maps.places.Autocomplete(input);
-    autocomplete.addListener('place_changed', function() {
-
-      self.clearMarkers();
-
-      // get clicked place info from the autocomplete input
-      self.currentPlace(autocomplete.getPlace());
-
-      // console.log(place);
-
-      // make sure that place has geometry infromation
-      if (self.currentPlace().geometry) {
-        // use foursquare API to check for libraries
-        self.searchLibraries();
-      }
-
-
-      // if in mobile view; hide navbar after delay
-      //so user notices filters
-      window.setTimeout(function() {
-
-        if ($(window).width() < 768) {
-          $('.navbar-toggle').click();
-        }
-      }, 1500);
-    });
+    self.autocomplete = new google.maps.places.Autocomplete(input);
+    self.autocomplete.addListener('place_changed', self.getPlaceFromInput);
   }(); // () used to run the function as soon as script is called
 
 
@@ -186,12 +203,20 @@ function AppViewModel() {
     var baseURL = 'https://api.foursquare.com/v2/';
     var method = 'venues/explore';
 
+    if (self.currentPlace().geometry === null || self.currentPlace().geometry === undefined) {
+      return;
+    } else if (self.currentPlace().geometry.location === null || self.currentPlace().geometry.location === undefined) {
+      return;
+    }
+
+    var location = self.currentPlace().geometry.location;
+
     var ajaxData = {
       client_id: clientId,
       client_secret: clientSecret,
       v: '20160230',
       query: 'library',
-      ll: self.currentPlace().geometry.location.lat() + ',' + self.currentPlace().geometry.location.lng(),
+      ll: location.lat() + ',' + location.lng(),
       limit: '50',
       sort: 'popular',
       categoryId: [categories.collegeLibrary]
@@ -239,9 +264,8 @@ function AppViewModel() {
 
         // console.log(items);
 
+        // delay of animation
         var delay = 50;
-
-        console.log(self.currentTab());
 
         // create a Library item for each item, and push it to libraries array
         $.each(items, function(index, item) {
@@ -272,28 +296,49 @@ function AppViewModel() {
           }, index * delay);
 
         });
-
-        console.log(self.libraries().length);
-
       }
     });
 
   };
-}
 
+  /********************* Helpers *********************/
+  self.showNoPlaceFoundPopover = function(status) {
+    if (status) {
+      $("[data-toggle='popover']").popover('show');
+      setTimeout(function() {
+        $("[data-toggle='popover']").popover('hide');
+      }, 2000);
+    } else {
+      $("[data-toggle='popover']").popover('destroy');
+    }
+  };
+
+  self.isCurrentPlaceAvailable = function() {
+    if (self.currentPlace() === null || self.currentPlace() === undefined) {
+      return false;
+    } else if (self.currentPlace().geometry === null || self.currentPlace().geometry === undefined) {
+      return false;
+    } else if (self.currentPlace().geometry.location === null || self.currentPlace().geometry.location === undefined) {
+      return false;
+    }
+    return true;
+  };
+
+  self.initNavbar = function() {
+    function hideNavBar() {
+      if ($(window).width() < 768) {
+        $('.navbar-toggle').click();
+      }
+    }
+
+    // hide navbar after a link is clicked
+    $('.nav a').on('click', function() {
+      // check if device is mobile first
+      hideNavBar();
+    });
+  }();  // () used to run the function as soon as script is called
+
+}
 
 // Activates knockout.js
 ko.applyBindings(new AppViewModel());
-
-
-function hideNavBar() {
-  if ($(window).width() < 768) {
-    $('.navbar-toggle').click();
-  }
-}
-
-// hide navbar after a link is clicked
-$('.nav a').on('click', function() {
-  // check if device is mobile first
-  hideNavBar();
-});
