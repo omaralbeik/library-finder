@@ -24,6 +24,8 @@ function AppViewModel() {
 
   // all current libraries will be stored in the libraries array
   self.libraries = ko.observableArray();
+
+  // suggested bounds for latest search, from foursquare
   self.currentSuggestedBounds = ko.observable();
 
   // current active tab in navbar
@@ -472,7 +474,6 @@ function AppViewModel() {
     }
 
     $td.click(function(event) {
-      console.log(library().mapMarker());
 
       // stop all old bouncing markers
       self.stopMarkersAnimation();
@@ -506,9 +507,30 @@ function AppViewModel() {
   };
 
   self.clearTable = function() {
-    $('#table').empty();
-    $('#table').prepend(table_search);
+    $('#table').find("tr:gt(0)").remove();
   };
+
+  self.searchTable = function(searchString) {
+
+    // clear table
+    self.clearTable();
+
+    $.each(self.libraries(), function(index, library) {
+
+      var lowerString = searchString.toLowerCase();
+      var lowerName = library().name().toLowerCase();
+
+      if (self.wordInString(lowerName, lowerString)) {
+        // add this library to table
+        self.addLibraryToTable(library);
+      }
+    });
+  };
+
+  self.wordInString = function(s, word) {
+    return new RegExp(word, 'i').test(s);
+  };
+
 
   /********************* Helpers *********************/
   self.showNoPlaceFoundPopover = function(status) {
@@ -570,7 +592,6 @@ function AppViewModel() {
 
     if (self.libraries().length > 0) {
 
-
       $('.table-container').toggle('drop');
       $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
         '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
@@ -592,6 +613,8 @@ function AppViewModel() {
 
     } else {
       $('#table-button').popover('show');
+      $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
+        '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
     }
 
   });
@@ -600,15 +623,19 @@ function AppViewModel() {
   $('.table-container').hide();
 
   // hide navbar if map clicked, when in mobile view
-  $('#map').click(function (event) {
-      var clickover = $(event.target);
-      var $navbar = $(".navbar-collapse");
-      var _opened = $navbar.hasClass("in");
-      if (_opened === true && !clickover.hasClass("navbar-toggle")) {
-          $navbar.collapse('hide');
-      }
+  $('#map').click(function(event) {
+    var clickover = $(event.target);
+    var $navbar = $(".navbar-collapse");
+    var _opened = $navbar.hasClass("in");
+    if (_opened === true && !clickover.hasClass("navbar-toggle")) {
+      $navbar.collapse('hide');
+    }
   });
 
+  // handle input from table input
+  $('.table-input').on('input', function() {
+    self.searchTable($('.table-input').val());
+  });
 
 }
 

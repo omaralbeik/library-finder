@@ -16,8 +16,6 @@ var info_foursquare = '<li><a href="https://foursquare.com/v/%id%" target="_blan
 var table_name = '<a href="#"><h1>%name%</h1></a>';
 var table_address = '<p>%address% %status%</p>';
 var table_rating = '<p>Rated: <strong style="color:#%color%;">%rating%</strong> by %users% visitors</p>';
-var table_search = '<tr><th><input type="text" class="form-control" placeholder="Filter libraries on map"></th></tr>';
-
 
 // extention to jQuery by Tomasz Majerski
 // http://stackoverflow.com/questions/2155453/jquery-toggle-text

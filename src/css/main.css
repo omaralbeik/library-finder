@@ -123,16 +123,13 @@ html, body {
 #table a {
   color: lightgray;
 }
-
 #table a:hover {
   text-decoration: none;
   color: white;
 }
-
 #table td:hover {
   background-color: rgba(137, 137, 137, 0.2);
 }
-
 #table-button {
   background-color: rgba(34, 34, 34, 0.9);
   color: white;
@@ -147,12 +144,18 @@ html, body {
     max-width: 95%;
     z-index: 1051 !important
   }
-  .form-control-feedback {
+  .navbar-collapse .form-control-feedback {
     margin-right: 30px;
   }
   .navbar {
     text-align: center;
   }
+
+  #table .form-control-feedback {
+    margin-top: -5px;
+  }
+
+
   .table-container {
     position: relative;
     min-width: 90%;
@@ -160,5 +163,4 @@ html, body {
     margin-right: auto;
     max-height: 80%;
   }
-
 }
