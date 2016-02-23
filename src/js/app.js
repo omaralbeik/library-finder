@@ -138,9 +138,17 @@ function AppViewModel() {
         maxWidth: 260
       });
 
+      google.maps.event.addListener(infowindow, 'closeclick', function() {
+        marker.setAnimation(null);
+      });
+
       library().markerInfoWindow(infowindow);
 
       marker.addListener('click', function() {
+
+        // bounce marker
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+
         // open info window when marker is clicked
         infowindow.open(map, marker);
       });
@@ -152,6 +160,7 @@ function AppViewModel() {
   self.stopMarkersAnimation = function() {
     $.each(self.libraries(), function(index, library) {
       library().mapMarker().setAnimation(null);
+      console.log(library());
     });
   };
 
