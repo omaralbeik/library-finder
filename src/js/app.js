@@ -88,6 +88,10 @@ function AppViewModel() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: initLocation,
       disableDefaultUI: false,
+      mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position: google.maps.ControlPosition.TOP_RIGHT
+      },
       scrollwheel: true,
       zoom: 12
     });
@@ -237,9 +241,9 @@ function AppViewModel() {
 
     // if rating is available, add it to info window
     if (library().rating() !== undefined && library().rating() !== null) {
-      info += info_rating.replace('%rating%',library().rating())
-      .replace('%color%', library().ratingColor())
-      .replace('%users%', library().usersCount());
+      info += info_rating.replace('%rating%', library().rating())
+        .replace('%color%', library().ratingColor())
+        .replace('%users%', library().usersCount());
     }
 
     // initialize contact details unordered list
@@ -490,6 +494,10 @@ function AppViewModel() {
       // open info window for clicked library's marker
       library().markerInfoWindow().open(map, library().mapMarker());
 
+      if ($(window).width() < 768) {
+        $('.table-container').toggle('drop');
+      }
+
     });
 
     $tr.append($td);
@@ -547,7 +555,7 @@ function AppViewModel() {
 
   // helper method to hide navbar in mobile view
   self.hideNavBar = function() {
-    if ($(window).width() < 768) {
+    if ($('.navbar-collapse').hasClass("in")) {
       $('.navbar-toggle').click();
     }
   };
@@ -562,25 +570,45 @@ function AppViewModel() {
 
     if (self.libraries().length > 0) {
 
-      // resize map back to latest suggestedBounds
-      if (self.currentSuggestedBounds() !== null && self.currentSuggestedBounds() !== undefined) {
-        self.fitMapToCurrentPlacesBounds();
-      }
 
-      // close all open info windows
-      self.closeAllMarkersInfoWindows();
-
-      // stop all bouncing markers
-      self.stopMarkersAnimation();
       $('.table-container').toggle('drop');
       $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
         '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
+
+      // hide table, zoom map out, stop markers animtaion only if not in mobile view
+      if ($(window).width() >= 768) {
+
+        // resize map back to latest suggestedBounds
+        if (self.currentSuggestedBounds() !== null && self.currentSuggestedBounds() !== undefined) {
+          self.fitMapToCurrentPlacesBounds();
+        }
+
+        // close all open info windows
+        self.closeAllMarkersInfoWindows();
+
+        // stop all bouncing markers
+        self.stopMarkersAnimation();
+      }
+
+    } else {
+      $('#table-button').popover('show');
     }
 
   });
 
   // hide table container initially
   $('.table-container').hide();
+
+  // hide navbar if map clicked, when in mobile view
+  $('#map').click(function (event) {
+      var clickover = $(event.target);
+      var $navbar = $(".navbar-collapse");
+      var _opened = $navbar.hasClass("in");
+      if (_opened === true && !clickover.hasClass("navbar-toggle")) {
+          $navbar.collapse('hide');
+      }
+  });
+
 
 }
 

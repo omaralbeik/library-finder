@@ -114,4 +114,4 @@ gulp.task('serve', function() {
   gulp.watch('bower_components/**', ['bower']);
 });
 
-gulp.task('default', ['img', 'js', 'css', 'html', 'bower', 'gzip']);
+gulp.task('default', ['img', 'js', 'css', 'html', 'bower']);

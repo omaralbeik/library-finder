@@ -29,9 +29,10 @@ html, body {
   font-weight: 400;
 }
 #map {
-  height: 100%;
+  height: calc(100% - 50px);
   width: 100%;
   left: 0;
+  top: 50px;
   position: absolute;
   z-index: 1 !important
 }
@@ -77,9 +78,9 @@ html, body {
   vertical-align: middle;
 }
 .table-container {
-  margin-top: 110px;
+  margin-top: 100px;
   max-width: 320px;
-  margin-left: 20px;
+  margin-left: 10px;
   z-index: 1000 !important;
   position: absolute;
   background-color: rgba(34, 34, 34, 0.9);
@@ -90,8 +91,8 @@ html, body {
   overflow-y: scroll;
 }
 #table-button {
-  margin-top: 70px;
-  margin-left: 20px;
+  margin-top: 60px;
+  margin-left: 10px;
   z-index: 1000 !important;
   position: absolute;
 }
@@ -152,4 +153,12 @@ html, body {
   .navbar {
     text-align: center;
   }
+  .table-container {
+    position: relative;
+    min-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 80%;
+  }
+
 }

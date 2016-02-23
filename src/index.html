@@ -59,7 +59,7 @@
 
       <div class="collapse navbar-collapse" id="menuNavbar">
         <form class="navbar-form navbar-left" role="search">
-          <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-toggle="popover" data-placement="bottom" title="No place found!" data-content="Please try another search term, or enter more specific address">
+          <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-toggle="popover" data-placement="bottom" data-content="No Place found!, Please try another search term, or enter more specific address">
         </form>
         <ul class="nav navbar-nav navbar-left">
           <li data-bind="css: {'active' : currentTab() === 'recommended'}"><a id="recommended-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchRecommended"> All <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'recommended')"></span></a></li>
@@ -74,7 +74,7 @@
     <div id="map"></div>
   </div>
 
-  <a id="table-button" class="btn btn-default" href="#" role="button"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
+  <a id="table-button" class="btn btn-default" href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
 
   <div class=" container table-container">
     <table id="table" class="table table-condensed"></table>
