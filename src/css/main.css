@@ -4,15 +4,14 @@ html, body {
 }
 .navbar {
   font-size: 1.2em;
-  font-weight: 200;
-  z-index: 2 !important;
+  font-weight: 300;
+  z-index: 1001 !important;
+  background-color: rgba(34, 34, 34, 0.9);
 }
-
 .navbar-form {
   padding-left: 0;
   padding-right: 10px;
 }
-
 .navbar-brand {
   font-size: 1.2em;
   font-weight: 200;
@@ -29,7 +28,6 @@ html, body {
   min-width: 320px;
   font-weight: 400;
 }
-
 #map {
   height: 100%;
   width: 100%;
@@ -37,7 +35,6 @@ html, body {
   position: absolute;
   z-index: 1 !important
 }
-
 .pac-container {
   margin-top: 10px;
   min-width: 320px;
@@ -59,32 +56,87 @@ html, body {
   font-family: 'Open Sans', sans-serif;
   font-weight: 700;
 }
-
 .info_name {
   margin-bottom: 10px;
 }
-
 .info-p {
   margin-top: 0;
   margin-bottom: 0;
 }
-
 .info_adress {
   font-size: 0.6em;
   font-weight: lighter;
 }
-
 .info_contact {
   list-style: none;
   padding-left: 0;
 }
-
 .info_contact li {
   display: inline-block;
   margin-right: 10px;
   vertical-align: middle;
 }
+.table-container {
+  margin-top: 110px;
+  max-width: 320px;
+  margin-left: 20px;
+  z-index: 1000 !important;
+  position: absolute;
+  background-color: rgba(34, 34, 34, 0.9);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 85%;
+  overflow-y: scroll;
+}
+#table-button {
+  margin-top: 70px;
+  margin-left: 20px;
+  z-index: 1000 !important;
+  position: absolute;
+}
+#table h1 {
+  font-size: 1.1em;
+  font-weight: 300;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+#table p {
+  font-size: 0.7em;
+  font-weight: 300;
+  margin-bottom: 1px;
+}
+#table input {
+  max-height: 25px;
+  font-size: 0.8em;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+#table th {
+  border: 0;
+}
+#table td {
+  border-top: 0;
+  margin-bottom: 15px;
+}
+#table a {
+  color: lightgray;
+}
 
+#table a:hover {
+  text-decoration: none;
+  color: white;
+}
+
+#table td:hover {
+  background-color: rgba(137, 137, 137, 0.2);
+}
+
+#table-button {
+  background-color: rgba(34, 34, 34, 0.9);
+  color: white;
+  font-weight: 300;
+}
 
 /* Extra small devices Phones (<768px) */
 
@@ -94,13 +146,10 @@ html, body {
     max-width: 95%;
     z-index: 1051 !important
   }
-
   .form-control-feedback {
     margin-right: 30px;
   }
-
   .navbar {
     text-align: center;
   }
-
 }

@@ -63,16 +63,16 @@ gulp.task('html', function() {
 gulp.task('js', function() {
   gulp.src('./src/**/*.js')
     // comment the next line to disbale maping js files
-    // .pipe(sourcemaps.init({
-    //   loadMaps: true
-    // }))
+    .pipe(sourcemaps.init({
+      loadMaps: true
+    }))
     .pipe(jsmin())
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(rename({
       suffix: '.min'
     }))
     // comment the next line to disbale maping js files
-    // .pipe(sourcemaps.write())
+    .pipe(sourcemaps.write())
     .pipe(gulp.dest(dest))
     .pipe(reload({
       stream: true

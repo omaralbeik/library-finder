@@ -12,6 +12,7 @@ var Library = function() {
   this.status = ko.observable();
   this.url = ko.observable();
   this.mapMarker = ko.observable();
+  this.markerInfoWindow = ko.observable();
 };
 
 // AppViewModel
@@ -23,6 +24,7 @@ function AppViewModel() {
 
   // all current libraries will be stored in the libraries array
   self.libraries = ko.observableArray();
+  self.currentSuggestedBounds = ko.observable();
 
   // current active tab in navbar
   self.currentTab = ko.observable('recommended');
@@ -130,6 +132,8 @@ function AppViewModel() {
         maxWidth: 260
       });
 
+      library().markerInfoWindow(infowindow);
+
       marker.addListener('click', function() {
         // open info window when marker is clicked
         infowindow.open(map, marker);
@@ -137,6 +141,39 @@ function AppViewModel() {
       // save created marker to librarie's mapMarker
       library().mapMarker(marker);
     }, delay); // run this function after delay passed
+  };
+
+  self.stopMarkersAnimation = function() {
+    $.each(self.libraries(), function(index, library) {
+      library().mapMarker().setAnimation(null);
+    });
+  };
+
+  self.closeAllMarkersInfoWindows = function() {
+    $.each(self.libraries(), function(index, library) {
+      library().markerInfoWindow().close(map, library().mapMarker());
+    });
+  };
+
+  self.fitMapToCurrentPlacesBounds = function() {
+
+    // create a new empty bounds
+    var bounds = new google.maps.LatLngBounds();
+
+    // get suggested bounds from foursquare
+
+    // get north east bounds from suggestedBounds
+    var ne = self.currentSuggestedBounds().ne;
+
+    // get south west bounds from suggestedBounds
+    var sw = self.currentSuggestedBounds().sw;
+
+    // extend bounds to fit ne and sw
+    bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
+    bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
+
+    // fit map to suggestedBounds
+    map.fitBounds(bounds);
   };
 
 
@@ -150,6 +187,9 @@ function AppViewModel() {
 
       // clear all markers
       self.clearMarkers();
+
+      // clear table
+      self.clearTable();
 
       // get clicked place info from the autocomplete input
       self.currentPlace(self.autocomplete.getPlace());
@@ -190,14 +230,16 @@ function AppViewModel() {
       info += info_status.replace('%status%', library().status());
     }
 
-    // if adress is available, add it to info window
+    // if address is available, add it to info window
     if (library().address() !== undefined && library().address() !== null) {
       info += info_address.replace('%address%', library().address());
     }
 
     // if rating is available, add it to info window
     if (library().rating() !== undefined && library().rating() !== null) {
-      info += info_rating.replace('%rating%', library().rating()).replace('%color%', library().ratingColor()).replace('%users%', library().usersCount());
+      info += info_rating.replace('%rating%',library().rating())
+      .replace('%color%', library().ratingColor())
+      .replace('%users%', library().usersCount());
     }
 
     // initialize contact details unordered list
@@ -247,15 +289,16 @@ function AppViewModel() {
       library: '4bf58dd8d48988d12f941735',
       collegeLibrary: '4bf58dd8d48988d1a7941735'
     },
-    limit: 30, // total results limit
+    limit: 100, // total results limit
     animationDelay: 50 // wait 50 ms before the next marker drops
   };
 
   // this method is used to search for libraries via foursquare API
   self.searchLibraries = function() {
 
-    // first things first, delete any old markers
+    // first things first, delete any old markers and table
     self.clearMarkers();
+    self.clearTable();
 
     self.inSearch(true); // set inSearch to true
     self.setTabLoading(true); // start loading current tab
@@ -276,6 +319,7 @@ function AppViewModel() {
       ll: location.lat() + ',' + location.lng(),
       limit: self.foursquareConstants.limit,
       sort: 'popular',
+      // radius: 1000,
       categoryId: [
         self.foursquareConstants.categories.library,
         self.foursquareConstants.categories.collegeLibrary
@@ -312,28 +356,11 @@ function AppViewModel() {
 
         // console.log(data);
 
-        // resize map to fit all results
-        /************************************/
-
-        // create a new empty bounds
-        var bounds = new google.maps.LatLngBounds();
-
         // get suggested bounds from foursquare
-        var suggestedBounds = data.response.suggestedBounds;
+        self.currentSuggestedBounds(data.response.suggestedBounds);
 
-        // get north east bounds from suggestedBounds
-        var ne = suggestedBounds.ne;
-
-        // get south west bounds from suggestedBounds
-        var sw = suggestedBounds.sw;
-
-        // extend bounds to fit ne and sw
-        bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
-        bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
-
-        // fit map to suggestedBounds
-        map.fitBounds(bounds);
-        /************************************/
+        // resize map to fit all results
+        self.fitMapToCurrentPlacesBounds();
 
         // get items from parsed data
         var items = data.response.groups[0].items;
@@ -373,6 +400,9 @@ function AppViewModel() {
             self.hideNavBar(); // hide navbar if in mobile view
           }, items.length * self.foursquareConstants.animationDelay);
 
+          // add library to libraries table
+          self.addLibraryToTable(library);
+
           // push library to array after delay, to make the illusion of numbers
           // increasing in current tab
           setTimeout(function() {
@@ -409,6 +439,68 @@ function AppViewModel() {
 
   };
 
+  /********************* Table *********************/
+  self.addLibraryToTable = function(library) {
+
+    var $tr = $('<tr>');
+    var $td = $('<td>');
+
+    $td.append(table_name.replace('%name%', library().name()));
+
+    var address;
+
+    if (library().address() !== undefined && library().address() !== null) {
+      address = table_address.replace('%address%', library().address());
+
+      // if status is available, add it to address
+      if (library().status() !== undefined && library().status() !== null) {
+        address.replace('%status%', library().status());
+      } else {
+        address.replace('%status%', '');
+      }
+    }
+
+    // if rating is available, add it
+    if (library().rating() !== undefined && library().rating() !== null) {
+      $td.append(table_rating.replace('%rating%', library().rating())
+        .replace('%color%', library().ratingColor())
+        .replace('%users%', library().usersCount()));
+    }
+
+    $td.click(function(event) {
+      console.log(library().mapMarker());
+
+      // stop all old bouncing markers
+      self.stopMarkersAnimation();
+
+      // bounce selected library's marker
+      library().mapMarker().setAnimation(google.maps.Animation.BOUNCE);
+
+      // change map's center
+      map.setCenter(new google.maps.LatLng(
+        library().mapMarker().position.lat(),
+        library().mapMarker().position.lng()
+      ));
+
+      map.setZoom(15);
+
+      // close all open info windows
+      self.closeAllMarkersInfoWindows();
+
+      // open info window for clicked library's marker
+      library().markerInfoWindow().open(map, library().mapMarker());
+
+    });
+
+    $tr.append($td);
+    $('#table').append($tr);
+
+  };
+
+  self.clearTable = function() {
+    $('#table').empty();
+    $('#table').prepend(table_search);
+  };
 
   /********************* Helpers *********************/
   self.showNoPlaceFoundPopover = function(status) {
@@ -452,6 +544,7 @@ function AppViewModel() {
     }
   };
 
+
   // helper method to hide navbar in mobile view
   self.hideNavBar = function() {
     if ($(window).width() < 768) {
@@ -461,6 +554,33 @@ function AppViewModel() {
 
   // add clear button to input
   $('input').addClear();
+
+  // handle show table button click
+  $('#table-button').click(function(event) {
+    /* Act on the event */
+    $('#table-button').toggleClass('active');
+
+    if (self.libraries().length > 0) {
+
+      // resize map back to latest suggestedBounds
+      if (self.currentSuggestedBounds() !== null && self.currentSuggestedBounds() !== undefined) {
+        self.fitMapToCurrentPlacesBounds();
+      }
+
+      // close all open info windows
+      self.closeAllMarkersInfoWindows();
+
+      // stop all bouncing markers
+      self.stopMarkersAnimation();
+      $('.table-container').toggle('drop');
+      $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
+        '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
+    }
+
+  });
+
+  // hide table container initially
+  $('.table-container').hide();
 
 }
 
