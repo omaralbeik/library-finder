@@ -128,7 +128,7 @@ html, body {
   color: white;
 }
 #table td:hover {
-  background-color: rgba(137, 137, 137, 0.2);
+  background-color: rgba(137, 137, 137, 0.4);
 }
 #table-button {
   background-color: rgba(34, 34, 34, 0.9);

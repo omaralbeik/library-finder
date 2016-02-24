@@ -14,7 +14,8 @@ var info_foursquare = '<li><a href="https://foursquare.com/v/%id%" target="_blan
 
 
 var table_name = '<a href="#"><h1>%name%</h1></a>';
-var table_address = '<p>%address% %status%</p>';
+var table_address = '<p>%address%</p>';
+var table_status = '<p>%status%</p>';
 var table_rating = '<p>Rated: <strong style="color:#%color%;">%rating%</strong> by %users% visitors</p>';
 
 // extention to jQuery by Tomasz Majerski

@@ -25,11 +25,11 @@ function AppViewModel() {
   // all current libraries will be stored in the libraries array
   self.libraries = ko.observableArray();
 
-  // suggested bounds for latest search, from foursquare
+  // suggested bounds for the latest search, from foursquare
   self.currentSuggestedBounds = ko.observable();
 
-  // current active tab in navbar
-  self.currentTab = ko.observable('recommended');
+  // current active tab in navbar // initially all
+  self.currentTab = ko.observable('all');
 
   // current place confirmed from google places autocomplete input
   self.currentPlace = ko.observable();
@@ -38,16 +38,17 @@ function AppViewModel() {
   // and when the request ends or fails, inSearch becomes false again
   self.inSearch = ko.observable(false);
 
+
   /********************* Search Methods *********************/
-  // search for recommended libraries, called from html
-  self.searchRecommended = function() {
-    // change current tab to the recommended tab
-    self.currentTab('recommended');
+  // search for all libraries, called from html data-bind
+  self.searchAll = function() {
+    // change current tab to the all tab
+    self.currentTab('all');
     // make sure current places info available
     if (self.isCurrentPlaceAvailable()) {
       self.searchLibraries();
     } else { // otherwise present error to user
-      self.showNoPlaceFoundPopover(true);
+      self.showNoPlaceFoundPopover();
     }
   };
 
@@ -59,7 +60,7 @@ function AppViewModel() {
     if (self.isCurrentPlaceAvailable()) {
       self.searchLibraries();
     } else { // otherwise present error to user
-      self.showNoPlaceFoundPopover(true);
+      self.showNoPlaceFoundPopover();
     }
   };
 
@@ -94,29 +95,31 @@ function AppViewModel() {
         style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
         position: google.maps.ControlPosition.TOP_RIGHT
       },
-      scrollwheel: true,
+      scrollwheel: true, // allo zooming by scrolling
       zoom: 12
     });
 
   }(); // () used to run the function as soon as script is called
 
 
-  // clearMarkers function is used to delete all markers on map
-  self.clearMarkers = function() {
-    for (var i = 0; i < self.libraries().length; i++) {
-      self.libraries()[i]().mapMarker().setMap(null);
-    }
+  // clearLibraries function is used to delete all markers on map
+  self.clearLibraries = function() {
+    // delete all markers
+    $.each(self.libraries(), function(index, library) {
+      library().mapMarker().setMap(null);
+    });
+
     // empty libraries array
     self.libraries.removeAll();
   };
 
   // addMarkerWithDelay function is used to create a merker with delay
-  self.addMarkerWithDelay = function(library, number, delay) {
+  self.addMarkerWithDelay = function(library, rate, delay) {
 
     window.setTimeout(function() {
       var icon;
       if (self.currentTab() === 'top') { // use numbered marker images
-        icon = 'img/markers/marker' + number + '.png';
+        icon = 'img/markers/marker' + rate + '.png';
       } else { // use normal marker image
         icon = 'img/markers/marker.png';
       }
@@ -124,7 +127,7 @@ function AppViewModel() {
       var marker = new google.maps.Marker({
         map: map,
         draggable: false,
-        title: library().name().name,
+        title: library().name(),
         animation: google.maps.Animation.DROP,
         icon: icon,
         position: {
@@ -135,11 +138,12 @@ function AppViewModel() {
 
       var infowindow = new google.maps.InfoWindow({
         content: self.generateInfoString(library),
-        maxWidth: 260
+        maxWidth: 280
       });
 
+      // add close button event handler
       google.maps.event.addListener(infowindow, 'closeclick', function() {
-        marker.setAnimation(null);
+        marker.setAnimation(null); // stop animation
       });
 
       library().markerInfoWindow(infowindow);
@@ -152,30 +156,30 @@ function AppViewModel() {
         // open info window when marker is clicked
         infowindow.open(map, marker);
       });
-      // save created marker to librarie's mapMarker
+      // save created marker to library's mapMarker
       library().mapMarker(marker);
     }, delay); // run this function after delay passed
   };
 
+  // stop all markers animation
   self.stopMarkersAnimation = function() {
     $.each(self.libraries(), function(index, library) {
       library().mapMarker().setAnimation(null);
-      console.log(library());
     });
   };
 
+  // close all info windows for all markers
   self.closeAllMarkersInfoWindows = function() {
     $.each(self.libraries(), function(index, library) {
       library().markerInfoWindow().close(map, library().mapMarker());
     });
   };
 
-  self.fitMapToCurrentPlacesBounds = function() {
+  // resize map back to latest suggested bounds
+  self.resizeMapToSuggestedBounds = function() {
 
     // create a new empty bounds
     var bounds = new google.maps.LatLngBounds();
-
-    // get suggested bounds from foursquare
 
     // get north east bounds from suggestedBounds
     var ne = self.currentSuggestedBounds().ne;
@@ -187,52 +191,9 @@ function AppViewModel() {
     bounds.extend(new google.maps.LatLng(ne.lat, ne.lng));
     bounds.extend(new google.maps.LatLng(sw.lat, sw.lng));
 
-    // fit map to suggestedBounds
+    // fit bounds into map
     map.fitBounds(bounds);
   };
-
-
-  /********************* Google Places *********************/
-
-  // this function gets place information from input and assign it back to
-  // global variable currentPlace
-  self.getPlaceFromInput = function() {
-
-    if (!self.inSearch()) {
-
-      // clear all markers
-      self.clearMarkers();
-
-      // clear table
-      self.clearTable();
-
-      // get clicked place info from the autocomplete input
-      self.currentPlace(self.autocomplete.getPlace());
-
-      // make sure that place has geometry infromation
-      if (self.currentPlace().geometry) {
-
-        // if error popover is shown, hide it
-        self.showNoPlaceFoundPopover(false);
-
-        // use foursquare API to check for libraries
-        self.searchLibraries();
-
-      } else { // palce couldn't be geocoded; show error popover
-        self.showNoPlaceFoundPopover(true);
-      }
-    }
-  };
-
-  // initialize autocompletion text input
-  self.initSearch = function() {
-
-    var input = document.getElementById('input');
-    var searchBox = new google.maps.places.SearchBox(input);
-
-    self.autocomplete = new google.maps.places.Autocomplete(input);
-    self.autocomplete.addListener('place_changed', self.getPlaceFromInput);
-  }(); // () used to run the function as soon as script is called
 
   // this method generate info window html contents
   self.generateInfoString = function(library) {
@@ -290,6 +251,45 @@ function AppViewModel() {
   };
 
 
+  /********************* Google Places *********************/
+
+  // this function gets place information from input and assign it back to
+  // global variable currentPlace
+  self.getPlaceFromInput = function() {
+
+    if (!self.inSearch()) { // if not in the middle of another request
+
+      // clear all libraries
+      self.clearLibraries();
+
+      // clear table
+      self.clearTable();
+
+      // get clicked place info from the autocomplete input
+      self.currentPlace(self.autocomplete.getPlace());
+
+      if (self.currentPlace().geometry) { // place has geometry infromation
+
+        // use foursquare API to check for libraries
+        self.searchLibraries();
+
+      } else { // palce couldn't be geocoded; show error popover
+        self.showNoPlaceFoundPopover();
+      }
+    }
+  };
+
+  // initialize autocompletion text input
+  self.initSearch = function() {
+
+    var input = document.getElementById('input');
+    var searchBox = new google.maps.places.SearchBox(input);
+
+    self.autocomplete = new google.maps.places.Autocomplete(input);
+    self.autocomplete.addListener('place_changed', self.getPlaceFromInput);
+  }(); // () used to run the function as soon as script is called
+
+
   /********************* Foursquare *********************/
 
   // constants will be used to compose the request for foursquare API
@@ -312,16 +312,18 @@ function AppViewModel() {
   self.searchLibraries = function() {
 
     // first things first, delete any old markers and table
-    self.clearMarkers();
+    self.clearLibraries();
     self.clearTable();
 
-    self.inSearch(true); // set inSearch to true
+    self.inSearch(true); // request started
     self.setTabLoading(true); // start loading current tab
 
-    if (self.currentPlace().geometry === null || self.currentPlace().geometry === undefined) {
-      return;
-    } else if (self.currentPlace().geometry.location === null || self.currentPlace().geometry.location === undefined) {
-      return;
+    if (self.currentPlace().geometry === null ||
+      self.currentPlace().geometry === undefined) {
+      return; // current place is not geocoded
+    } else if (self.currentPlace().geometry.location === null
+    || self.currentPlace().geometry.location === undefined) {
+      return; // any other problem
     }
 
     var location = self.currentPlace().geometry.location;
@@ -329,12 +331,12 @@ function AppViewModel() {
     var ajaxData = {
       client_id: self.foursquareConstants.clientId,
       client_secret: self.foursquareConstants.clientSecret,
-      v: '20160230',
+      v: '20160230', // the "version" of the API expected from Foursquare
       query: 'library',
       ll: location.lat() + ',' + location.lng(),
       limit: self.foursquareConstants.limit,
       sort: 'popular',
-      // radius: 1000,
+      // radius: 1000, // enable for more accurate results (in meters)
       categoryId: [
         self.foursquareConstants.categories.library,
         self.foursquareConstants.categories.collegeLibrary
@@ -344,7 +346,7 @@ function AppViewModel() {
     if (self.currentTab() === 'open') {
       ajaxData.openNow = true; // show only open libraries
     } else if (self.currentTab() === 'top') {
-      ajaxData.limit = 10; // reduce number of results to 10 only
+      ajaxData.limit = 10; // reduce number of results to first 10 only
     }
 
     $.ajax({
@@ -352,7 +354,7 @@ function AppViewModel() {
       type: 'GET',
       dataType: 'json',
       data: ajaxData,
-      timeout: 10000, // set request timeout to 10 seconds
+      timeout: 7000, // set request timeout to 7 seconds
       success: function(data) {
 
         if (data.response.totalResults < 1) { // 0 results found
@@ -369,13 +371,11 @@ function AppViewModel() {
           return; // exit the method
         }
 
-        // console.log(data);
-
         // get suggested bounds from foursquare
         self.currentSuggestedBounds(data.response.suggestedBounds);
 
         // resize map to fit all results
-        self.fitMapToCurrentPlacesBounds();
+        self.resizeMapToSuggestedBounds();
 
         // get items from parsed data
         var items = data.response.groups[0].items;
@@ -404,13 +404,15 @@ function AppViewModel() {
           }
 
           if (self.currentTab() == 'top') {
-            self.addMarkerWithDelay(library, (index + 1).toString(), index * self.foursquareConstants.animationDelay);
+            self.addMarkerWithDelay(library, (index + 1).toString(),
+            index * self.foursquareConstants.animationDelay);
           } else {
-            self.addMarkerWithDelay(library, "", index * self.foursquareConstants.animationDelay);
+            self.addMarkerWithDelay(library, "",
+            index * self.foursquareConstants.animationDelay);
           }
 
           setTimeout(function() {
-            self.inSearch(false); //finish search
+            self.inSearch(false); // search finished
             self.setTabLoading(false); // remove loading from current tab
             self.hideNavBar(); // hide navbar if in mobile view
           }, items.length * self.foursquareConstants.animationDelay);
@@ -426,7 +428,7 @@ function AppViewModel() {
 
         });
       },
-      // excute if request failed
+      // excutes if the request failed
       fail: function(error) {
         self.inSearch(false); //finish search
         self.setTabLoading(false); // remove loading from current tab
@@ -454,6 +456,7 @@ function AppViewModel() {
 
   };
 
+
   /********************* Table *********************/
   self.addLibraryToTable = function(library) {
 
@@ -462,17 +465,13 @@ function AppViewModel() {
 
     $td.append(table_name.replace('%name%', library().name()));
 
-    var address;
-
     if (library().address() !== undefined && library().address() !== null) {
-      address = table_address.replace('%address%', library().address());
+      $td.append(table_address.replace('%address%', library().address()));
+    }
 
-      // if status is available, add it to address
-      if (library().status() !== undefined && library().status() !== null) {
-        address.replace('%status%', library().status());
-      } else {
-        address.replace('%status%', '');
-      }
+    // if status is available, add it to address
+    if (library().status() !== undefined && library().status() !== null) {
+      $td.append(table_status.replace('%status%', library().status()));
     }
 
     // if rating is available, add it
@@ -487,7 +486,7 @@ function AppViewModel() {
       // stop all old bouncing markers
       self.stopMarkersAnimation();
 
-      // bounce selected library's marker
+      // bounce selected marker
       library().mapMarker().setAnimation(google.maps.Animation.BOUNCE);
 
       // change map's center
@@ -496,7 +495,7 @@ function AppViewModel() {
         library().mapMarker().position.lng()
       ));
 
-      map.setZoom(15);
+      map.setZoom(16);
 
       // close all open info windows
       self.closeAllMarkersInfoWindows();
@@ -504,8 +503,9 @@ function AppViewModel() {
       // open info window for clicked library's marker
       library().markerInfoWindow().open(map, library().mapMarker());
 
+      // if in mobile view hide table
       if ($(window).width() < 768) {
-        $('.table-container').toggle('drop');
+        self.toggleTable();
       }
 
     });
@@ -515,6 +515,7 @@ function AppViewModel() {
 
   };
 
+  // this method delete all row in table and keeps the search form (first row)
   self.clearTable = function() {
     $('#table').find("tr:gt(0)").remove();
   };
@@ -526,6 +527,7 @@ function AppViewModel() {
 
     $.each(self.libraries(), function(index, library) {
 
+      // change searchString and library's name to lower string
       var lowerString = searchString.toLowerCase();
       var lowerName = library().name().toLowerCase();
 
@@ -536,30 +538,35 @@ function AppViewModel() {
     });
   };
 
-  self.wordInString = function(s, word) {
-    return new RegExp(word, 'i').test(s);
+  self.toggleTable = function() {
+    $('.table-container').toggle('drop');
+    $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
+      '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
   };
 
 
   /********************* Helpers *********************/
-  self.showNoPlaceFoundPopover = function(status) {
-    if (status) { // show popover for 2 seconds
-      $("[data-toggle='popover']").popover('show');
-      setTimeout(function() {
-        $("[data-toggle='popover']").popover('hide');
-      }, 2000);
-    } else { // hide popover
-      $("[data-toggle='popover']").popover('destroy');
-    }
+  self.showNoPlaceFoundPopover = function() {
+    $('#input').popover('show');
+    setTimeout(function() {
+      $('#input').popover('destroy');
+    },2000);
   };
 
-  // helper method to check if current place is available and successfully geocoded
+  // returns tru if string contains given word
+  self.wordInString = function(s, word) {
+    return new RegExp(word, 'i').test(s); // regular expression
+  };
+
+  // helper method to check if current place is available and geocoded
   self.isCurrentPlaceAvailable = function() {
     if (self.currentPlace() === null || self.currentPlace() === undefined) {
       return false;
-    } else if (self.currentPlace().geometry === null || self.currentPlace().geometry === undefined) {
+    } else if (self.currentPlace().geometry === null ||
+    self.currentPlace().geometry === undefined) {
       return false;
-    } else if (self.currentPlace().geometry.location === null || self.currentPlace().geometry.location === undefined) {
+    } else if (self.currentPlace().geometry.location === null ||
+    self.currentPlace().geometry.location === undefined) {
       return false;
     }
     return true;
@@ -569,20 +576,22 @@ function AppViewModel() {
   self.setTabLoading = function(loading) {
 
     if (loading) { // show spinner
-      if (self.currentTab() === 'recommended') {
-        $('#recommended-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+      if (self.currentTab() === 'all') {
+        $('#all-button')
+        .prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
       }
       if (self.currentTab() === 'open') {
-        $('#open-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+        $('#open-button')
+        .prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
       }
       if (self.currentTab() === 'top') {
-        $('#top-button').prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
+        $('#top-button')
+        .prepend('<i class="fa fa-circle-o-notch fa-spin"></i>');
       }
     } else { // hide spinner
       $('i.fa-spin').remove();
     }
   };
-
 
   // helper method to hide navbar in mobile view
   self.hideNavBar = function() {
@@ -601,16 +610,14 @@ function AppViewModel() {
 
     if (self.libraries().length > 0) {
 
-      $('.table-container').toggle('drop');
-      $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
-        '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
+      self.toggleTable();
 
-      // hide table, zoom map out, stop markers animtaion only if not in mobile view
-      if ($(window).width() >= 768) {
+      if ($(window).width() >= 768) { // in mobile view
 
-        // resize map back to latest suggestedBounds
-        if (self.currentSuggestedBounds() !== null && self.currentSuggestedBounds() !== undefined) {
-          self.fitMapToCurrentPlacesBounds();
+        // resize map back to last suggested bounds
+        if (self.currentSuggestedBounds() !== null &&
+        self.currentSuggestedBounds() !== undefined) {
+          self.resizeMapToSuggestedBounds();
         }
 
         // close all open info windows
@@ -620,16 +627,18 @@ function AppViewModel() {
         self.stopMarkersAnimation();
       }
 
-    } else {
+    } else { // show pop over error to user
       $('#table-button').popover('show');
-      $('#table-button').toggleText('<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> Hide List',
-        '<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show List');
+      setTimeout(function() {
+        $('#table-button').popover('destroy');
+      }, 2000);
     }
 
   });
 
   // hide table container initially
   $('.table-container').hide();
+  $('.table-container').removeClass('hidden');
 
   // hide navbar if map clicked, when in mobile view
   $('#map').click(function(event) {
