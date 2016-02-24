@@ -62,17 +62,17 @@ gulp.task('html', function() {
 
 gulp.task('js', function() {
   gulp.src('./src/**/*.js')
-    // comment the next line to disbale maping js files
-    .pipe(sourcemaps.init({
-      loadMaps: true
-    }))
+    // uncomment the next line to enable maping js files
+    // .pipe(sourcemaps.init({
+    //   loadMaps: true
+    // }))
     .pipe(jsmin())
     // .pipe(uglify())
     .pipe(rename({
       suffix: '.min'
     }))
-    // comment the next line to disbale maping js files
-    .pipe(sourcemaps.write())
+    // uncomment the next line to enable maping js files
+    // .pipe(sourcemaps.write())
     .pipe(gulp.dest(dest))
     .pipe(reload({
       stream: true
@@ -81,9 +81,11 @@ gulp.task('js', function() {
 
 gulp.task('css', function() {
   gulp.src('src/**/*.css')
-    .pipe(sourcemaps.init())
+  // uncomment the next line to enable maping css files
+    // .pipe(sourcemaps.init())
     .pipe(cssnano())
-    .pipe(sourcemaps.write('.'))
+    // uncomment the next line to enable maping css files
+    // .pipe(sourcemaps.write('.'))
     .pipe(rename({
       suffix: '.min'
     }))
