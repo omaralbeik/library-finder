@@ -63,6 +63,11 @@ var resizeMapToBounds = function(bounds, mapReady) {
   // fit bounds into map
   map.fitBounds(bnds);
   google.maps.event.addListenerOnce(map, 'idle', mapReady);
+
+  window.onresize = function() {
+    map.fitBounds(bnds); // `bounds` is a `LatLngBounds` object
+  };
+  
 };
 
 var creatMarker = function(library, currentTab, rate) {

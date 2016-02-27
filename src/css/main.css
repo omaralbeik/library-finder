@@ -99,49 +99,56 @@ html, body {
   max-height: 85%;
   overflow-y: scroll;
 }
+
 #table-button {
   margin-top: 60px;
   margin-left: 10px;
   z-index: 1000 !important;
   position: absolute;
 }
-#table h1 {
+
+.list-view h1 {
   font-size: 1.2em;
   font-weight: 400;
   margin-top: 5px;
   margin-bottom: 5px;
 }
-#table p {
+
+.list-view p {
   font-size: 0.9em;
   font-weight: 300;
   margin-bottom: 1px;
 }
 
-#table tbody {
+.table>tbody>tbody {
   border-top: 0px;
 }
 
-#table input {
+.list-view input {
   max-height: 25px;
   font-size: 0.8em;
   font-weight: 400;
   margin-bottom: 10px;
 }
-#table th {
+
+.table>tbody>tr>th {
   border: 0;
 }
-#table td {
+
+.table>tbody>tr>td {
   border-top: 0;
   margin-bottom: 15px;
 }
-#table a {
+
+.list-view a {
   color: lightgray;
 }
-#table a:hover {
+
+.list-view a:hover {
   text-decoration: none;
   color: white;
 }
-#table td:hover {
+.list-view td:hover {
   background-color: rgba(137, 137, 137, 0.4);
 }
 #table-button {
@@ -165,10 +172,9 @@ html, body {
     text-align: center;
   }
 
-  #table .form-control-feedback {
+  .list-view .form-control-feedback {
     margin-top: -5px;
   }
-
 
   .table-container {
     position: relative;

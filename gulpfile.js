@@ -62,19 +62,19 @@ gulp.task('html', function() {
 });
 
 gulp.task('js', function() {
-  gulp.src('./src/**/*.js')
+  return gulp.src(['./src/js/misc.js', './src/js/model.js', './src/js/foursquare.js', './src/js/maps.js', './src/js/app.js'])
     // uncomment the next line to enable maping js files
-    .pipe(sourcemaps.init({
-      loadMaps: true
-    }))
+    // .pipe(sourcemaps.init({
+    //   loadMaps: true
+    // }))
+    .pipe(concat('app.js'))
     .pipe(jsmin())
-    // .pipe(uglify())
     .pipe(rename({
       suffix: '.min'
     }))
     // uncomment the next line to enable maping js files
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(dest))
+    // .pipe(sourcemaps.write())
+    .pipe(gulp.dest(dest + 'js/'))
     .pipe(reload({
       stream: true
     }));
@@ -82,7 +82,7 @@ gulp.task('js', function() {
 
 gulp.task('css', function() {
   gulp.src('src/**/*.css')
-  // uncomment the next line to enable maping css files
+    // uncomment the next line to enable maping css files
     .pipe(sourcemaps.init())
     .pipe(cssnano())
     // uncomment the next line to enable maping css files

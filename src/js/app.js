@@ -58,7 +58,7 @@ var AppViewModel = function() {
           self.searchLibraries();
 
         } else {
-          console.log('should handle error');
+          showNoPlaceFoundPopover();
         }
       });
       self.searchLibraries();
@@ -88,7 +88,7 @@ var AppViewModel = function() {
           self.searchLibraries();
 
         } else {
-          console.log('should handle error');
+          showNoPlaceFoundPopover();
         }
       });
 
@@ -151,8 +151,16 @@ var AppViewModel = function() {
       });
 
     }, function(error) {
-      console.warn('Foursquare: ' + error.statusText);
-      alert('Foursquare error: ' + error.statusText);
+
+      var errorString;
+
+      if (error.status === 0) { // request timed out
+          errorString = "the request timed out please try again.";
+        } else { // some other error
+          errorString = error.statusText;
+        }
+      console.warn('Foursquare: ' + errorString);
+      alert(errorString); // show error in alert to user
     });
   };
 

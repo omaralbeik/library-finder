@@ -84,13 +84,13 @@
   </div>
 
   <div class="container">
-    <div id="map"></div>
+    <div id="map" class="map"></div>
   </div>
 
-  <a data-bind="click: toggleTable" id="table-button" class="btn btn-default" href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
+  <a data-bind="click: toggleTable" id="table-button" class="btn btn-default " href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
 
   <div class=" container table-container hidden">
-    <table id="table" class="table table-condensed">
+    <table id="table" class="table table-condensed list-view">
       <tr>
         <th>
           <input type="text" class="form-control table-input" placeholder="Filter libraries on map">
@@ -116,7 +116,7 @@
 
   <!-- jQuery -->
   <script src="libs/jquery/dist/jquery.min.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
   <!-- Bootstrap -->
   <script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -142,10 +142,6 @@
 
   <!-- knockout -->
   <script src="libs/knockout/dist/knockout.js"></script>
-  <script src="js/misc.min.js"></script>
-  <script src="js/model.min.js"></script>
-  <script src="js/foursquare.min.js"></script>
-  <script src="js/maps.min.js"></script>
   <script src="js/app.min.js"></script>
 
 </body>
