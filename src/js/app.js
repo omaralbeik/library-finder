@@ -6,6 +6,7 @@ var AppViewModel = function() {
 
   // all current libraries will be stored in the libraries array
   self.libraries = ko.observableArray();
+  self.filteredLibraries = ko.observableArray();
 
   self.currentLocation = ko.observable();
 
@@ -21,6 +22,8 @@ var AppViewModel = function() {
   // and when the request ends or fails, inSearch becomes false again
   self.inSearch = ko.observable(false);
 
+  self.query = ko.observable('');
+
   self.searchAll = function() {
     self.currentTab('all');
     self.searchLibraries();
@@ -34,6 +37,15 @@ var AppViewModel = function() {
   self.searchTop = function() {
     self.currentTab('top');
     self.searchLibraries();
+  };
+
+  self.search = function(value) {
+    self.filteredLibraries.removeAll(); // empty libraries array
+    for (var i in self.libraries()) {
+      if (self.libraries()[i]().name().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+        self.filteredLibraries.push(self.libraries()[i]);
+      }
+    }
   };
 
   setCurrentLocation(function(pos) { // get location
@@ -141,6 +153,7 @@ var AppViewModel = function() {
             }
 
             self.libraries.push(library);
+            self.filteredLibraries.push(library);
           }, delay);
         });
 
@@ -199,6 +212,7 @@ var AppViewModel = function() {
 
 
 var appVM = new AppViewModel();
+appVM.query.subscribe(appVM.search);
 
 // Activates knockout.js
 ko.applyBindings(appVM);

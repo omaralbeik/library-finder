@@ -93,10 +93,10 @@
     <table id="table" class="table table-condensed list-view">
       <tr>
         <th>
-          <input type="text" class="form-control table-input" placeholder="Filter libraries on map">
+          <input type="search" class="form-control table-input" placeholder="Filter libraries on map" name="q" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
         </th>
       </tr>
-      <tbody data-bind="foreach: libraries">
+      <tbody data-bind="foreach: filteredLibraries">
         <tr>
           <td>
             <a href="#" data-bind="click: $parent.showLibrary"><h1 data-bind="text: name"></h1></a>
