@@ -6,14 +6,15 @@ var AppViewModel = function() {
 
   // all current libraries will be stored in the libraries array
   self.libraries = ko.observableArray();
+
+  // copied from libraries, will be filtred based on a search query
   self.filteredLibraries = ko.observableArray();
 
+  // lastest location captured from google autocomplete
   self.currentLocation = ko.observable();
 
   // suggested bounds for the latest search, from foursquare
   self.currentSuggestedBounds = ko.observable();
-
-  self.latestLatLngBounds = ko.observable();
 
   // current active tab in navbar // initially all
   self.currentTab = ko.observable('all');
@@ -22,23 +23,28 @@ var AppViewModel = function() {
   // and when the request ends or fails, inSearch becomes false again
   self.inSearch = ko.observable(false);
 
+  // search string from input in table view will be saved here
   self.query = ko.observable('');
 
+  // search all libraries
   self.searchAll = function() {
     self.currentTab('all');
     self.searchLibraries();
   };
 
+  // search open libraries
   self.searchOpen = function() {
     self.currentTab('open');
     self.searchLibraries();
   };
 
+  // search top 10 libraries
   self.searchTop = function() {
     self.currentTab('top');
     self.searchLibraries();
   };
 
+  // search for library by query, will be used in list view
   self.search = function(value) {
     self.filteredLibraries.removeAll(); // empty libraries array
     for (var i in self.libraries()) {
@@ -48,15 +54,16 @@ var AppViewModel = function() {
     }
   };
 
-  setCurrentLocation(function(pos) { // get location
-    var crd = pos.coords;
 
+  setCurrentLocation(function(pos) { // location successfully saved
+    var crd = pos.coords;
     self.currentLocation({
       lat: crd.latitude,
       lng: crd.longitude
     });
 
     setMap(self.currentLocation(), function() {
+
       // map is ready
       autocomplete.addListener('place_changed', function() {
         var place = autocomplete.getPlace();
@@ -66,20 +73,24 @@ var AppViewModel = function() {
             lng: place.geometry.location.lng(),
           };
 
+          // update currentLocation
           self.currentLocation(loc);
+
+          // search for libraries
           self.searchLibraries();
 
-        } else {
+        } else { // handle error
           showNoPlaceFoundPopover();
         }
       });
+      // search for libraries
       self.searchLibraries();
     });
 
-  }, function(err) { // handle error
+  }, function(err) { // there was an error getting users location
     console.warn('ERROR(' + err.code + '): ' + err.message);
 
-    // initial location for map to Bahçeşehir University, Istanbul
+    // initial location for map set to Bahçeşehir University, Istanbul
     self.currentLocation({
       lat: 41.0417,
       lng: 29.0094
@@ -88,70 +99,78 @@ var AppViewModel = function() {
     setMap(self.currentLocation(), function() {
       // map is ready
 
+      // get place from autocomplete input
       autocomplete.addListener('place_changed', function() {
         var place = autocomplete.getPlace();
-        if (isPlaceValid(place)) {
+        if (isPlaceValid(place)) { // check if place is valid
           var loc = {
             lat: place.geometry.location.lat(),
             lng: place.geometry.location.lng(),
           };
 
+          // update currentLocation
           self.currentLocation(loc);
+
+          // search for libraries
           self.searchLibraries();
 
-        } else {
+        } else { // handle error
           showNoPlaceFoundPopover();
         }
       });
-
+      // search for libraries
       self.searchLibraries();
     });
   });
 
+  // this function is used search for libraries
   self.searchLibraries = function() {
 
     self.inSearch(true); // search started
 
+    // remove any old markers
     $.each(self.libraries(), function(index, library) {
       library().mapMarker().setMap(null);
     });
 
-    self.libraries.removeAll(); // empty libraries array
+    // remove old libraries
+    self.libraries.removeAll();
+    self.filteredLibraries.removeAll();
 
     searchForLibrariesNearLocation(self.currentLocation(), self.currentTab(), function(data) {
 
       var items = data.response.groups[0].items;
       if (items.length < 1) {
         self.inSearch(false);
-        if (self.currentTab() === 'open') {
+        if (self.currentTab() === 'open') { // handle no open libraries
           alert("No open libraries now!, please try again later.");
-        } else {
+        } else { // handle no results
           alert("No Libraries found!");
         }
         return;
       }
 
-
-      // get suggested bounds from foursquare
+      // get suggested bounds from foursquare and update currentSuggestedBounds
       var suggestedBounds = data.response.suggestedBounds;
       self.currentSuggestedBounds(suggestedBounds);
 
       resizeMapToBounds(self.currentSuggestedBounds(), function() {
         // map is ready
-
-        var totalDelay = items.length * 50;
+        var totalDelay = items.length * 50; // total delay for all markers
 
         $.each(items, function(index, item) {
           var library = createLibraryFromItem(item);
           var delay = index * 50;
 
+          // add markers after delay, raining effect
           setTimeout(function() {
-            if (self.currentTab() === 'top') {
+            if (self.currentTab() === 'top') { // add numbered markers icons
               creatMarker(library(), self.currentTab(), index + 1);
-            } else {
+            } else { // add normal markers icons
               creatMarker(library(), self.currentTab(), null);
             }
 
+            // add to libraries arrays
             self.libraries.push(library);
             self.filteredLibraries.push(library);
           }, delay);
@@ -159,11 +178,15 @@ var AppViewModel = function() {
 
         setTimeout(function() {
           self.inSearch(false); // search ended
+          // if in mobile view, hide navbar after total delay, to let user notice badge changes
+          if ($(window).width() < 768) {
+            hideNavBar();
+          }
         }, totalDelay);
 
       });
 
-    }, function(error) {
+    }, function(error) { // handle errors
 
       var errorString;
 
@@ -177,6 +200,7 @@ var AppViewModel = function() {
     });
   };
 
+  // this function will be used to show library when choosed from table
   self.showLibrary = function(library) {
 
     // if in mobile view, close list view
@@ -212,7 +236,7 @@ var AppViewModel = function() {
 
 
 var appVM = new AppViewModel();
-appVM.query.subscribe(appVM.search);
+appVM.query.subscribe(appVM.search); // subscribe to search
 
 // Activates knockout.js
 ko.applyBindings(appVM);

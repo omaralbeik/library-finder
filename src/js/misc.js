@@ -25,11 +25,6 @@ $.fn.extend({
   }
 });
 
-// returns true if string contains given word
-var wordInString = function(s, word) {
-  return new RegExp(word, 'i').test(s); // regular expression
-};
-
 // hide navbar if map clicked, when in mobile view
 $('#map').click(function(event) {
   var clickover = $(event.target);
