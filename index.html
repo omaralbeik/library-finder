@@ -25,7 +25,6 @@
   <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
   <meta name="theme-color" content="#ffffff">
 
-
   <!-- Nurmalize.css for better browsers compatibility
     https://necolas.github.io/normalize.css/ -->
   <link rel="stylesheet" href="libs/normalize-css/normalize.css">
@@ -54,17 +53,31 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#"><i class="fa fa-book"></i> Library Finder</a>
+        <a class="navbar-brand" href="#" onclick="location.reload(true); return false"><i class="fa fa-book"></i> Library Finder</a>
       </div>
 
       <div class="collapse navbar-collapse" id="menuNavbar">
-        <form class="navbar-form navbar-left" role="search">
+        <form class="navbar-form navbar-left" role="search" onkeypress="return event.keyCode != 13">
           <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-toggle="popover" data-trigger="focus" data-placement="bottom" data-content="No Place found!, Please try another search term, or enter more specific address">
         </form>
         <ul class="nav navbar-nav navbar-left">
-          <li data-bind="css: {'active' : currentTab() === 'all'}"><a id="all-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchAll"> All <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'all')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'open'}"><a id="open-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchOpen"> Open Now <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span></a></li>
-          <li data-bind="css: {'active' : currentTab() == 'top'}"><a id="top-button" href="#" data-bind="click: (inSearch() || currentPlace() == null)? null : searchTop"> Top 10</a></li>
+          <li data-bind="css: {'active' : currentTab() === 'all'}">
+            <a id="all-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchAll">
+              <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'all'"></i> All
+              <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'all')"></span>
+            </a>
+          </li>
+          <li data-bind="css: {'active' : currentTab() == 'open'}">
+            <a id="open-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchOpen">
+              <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'open'"></i> Open Now
+              <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span>
+            </a>
+          </li>
+          <li data-bind="css: {'active' : currentTab() == 'top'}">
+            <a id="top-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchTop">
+              <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'top'"></i> Top 10
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -74,7 +87,7 @@
     <div id="map"></div>
   </div>
 
-  <a id="table-button" class="btn btn-default" href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
+  <a data-bind="click: toggleTable" id="table-button" class="btn btn-default" href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
 
   <div class="container table-container hidden">
     <table id="table" class="table table-condensed">
@@ -83,14 +96,26 @@
           <input type="text" class="form-control table-input" placeholder="Filter libraries on map">
         </th>
       </tr>
+      <tbody data-bind="foreach: libraries">
+        <tr>
+          <td>
+            <a href="#" data-bind="click: $parent.showLibrary"><h1 data-bind="text: name"></h1></a>
+            <p data-bind="visible: address"><i class="fa fa-location-arrow"></i> <span data-bind="text: address"></span></p>
+            <p data-bind="visible: status"><i class="fa fa-clock-o"></i> <span data-bind="text: status"></span></p>
+            <p data-bind="visible: rating"><i class="fa fa-star"></i> Rated <span><strong data-bind="text: rating, style: {color: ratingColor()}"></strong> by <span data-bind="text: usersCount"></span> users.</span>
+            </p>
+          </td>
+
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <!-- ajax -->
-  <script type="text/javascript" src="libs/ajax/dist/ajax.min.js"></script>
+  <script src="libs/ajax/dist/ajax.min.js"></script>
 
   <!-- jQuery -->
-  <script type="text/javascript" src="libs/jquery/dist/jquery.min.js"></script>
+  <script src="libs/jquery/dist/jquery.min.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
   <!-- Bootstrap -->
@@ -100,12 +125,28 @@
   <script src="libs/bootstrap-add-clear/bootstrap-add-clear.min.js"></script>
 
   <!-- Google Maps -->
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfzyLeFjKiBUipjWUL2AGEyLhVl2QOroE&libraries=places"></script>
+  <script>
+    var map;
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: 41.0417,
+          lng: 29.0094
+        },
+        zoom: 12
+      });
+    }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfzyLeFjKiBUipjWUL2AGEyLhVl2QOroE&libraries=places&callback=initMap" async defer="defer"></script>
 
   <!-- knockout -->
-  <script type="text/javascript" src="libs/knockout/dist/knockout.js"></script>
-  <script type="text/javascript" src="js/misc.min.js"></script>
-  <script type="text/javascript" src="js/app.min.js"></script>
+  <script src="libs/knockout/dist/knockout.js"></script>
+  <script src="js/misc.min.js"></script>
+  <script src="js/model.min.js"></script>
+  <script src="js/foursquare.min.js"></script>
+  <script src="js/maps.min.js"></script>
+  <script src="js/app.min.js"></script>
 
 </body>
 
