@@ -2,6 +2,7 @@ html, body {
   height: 100%;
   font-family: 'Open Sans', sans-serif;
 }
+
 .navbar {
   font-size: 1.2em;
   font-weight: 300;
@@ -36,8 +37,16 @@ html, body {
   position: absolute;
   z-index: 1 !important
 }
+
+.error {
+  height: 100%;
+  width: 100%;
+  top: 50%;
+  position: absolute;
+  text-align: center;
+}
 .pac-container {
-  margin-top: 10px;
+  margin-top: 0px;
   min-width: 320px;
   font-size: 1.2em;
   -webkit-border-bottom-right-radius: 5px;
@@ -97,16 +106,21 @@ html, body {
   position: absolute;
 }
 #table h1 {
-  font-size: 1.1em;
-  font-weight: 300;
+  font-size: 1.2em;
+  font-weight: 400;
   margin-top: 5px;
   margin-bottom: 5px;
 }
 #table p {
-  font-size: 0.7em;
+  font-size: 0.9em;
   font-weight: 300;
   margin-bottom: 1px;
 }
+
+#table tbody {
+  border-top: 0px;
+}
+
 #table input {
   max-height: 25px;
   font-size: 0.8em;

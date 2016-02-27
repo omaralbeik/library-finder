@@ -11,6 +11,7 @@
     "bower": "^1.7.7",
     "browser-sync": "^2.11.1",
     "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
     "gulp-cssnano": "^2.1.1",
     "gulp-filter": "^3.0.1",
     "gulp-gzip": "^1.2.0",
