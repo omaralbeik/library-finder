@@ -166,6 +166,7 @@ var AppViewModel = function() {
       self.currentSuggestedBounds(suggestedBounds);
 
       map.setZoom(map.getZoom() + 1);
+      console.log('map zoom changed');
 
       resizeMapToBounds(self.currentSuggestedBounds(), function() {
         // map is ready
