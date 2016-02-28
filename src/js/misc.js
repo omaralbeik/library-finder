@@ -49,7 +49,7 @@ var toggleTable = function() {
 };
 
 // add clear button to input
-$('input').addClear();
+$('#input').addClear();
 
 // hide table container initially
 $('.table-container').hide();

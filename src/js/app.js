@@ -57,8 +57,11 @@ var AppViewModel = function() {
   self.search = function(value) {
     self.filteredLibraries.removeAll(); // empty libraries array
     for (var i in self.libraries()) {
+      self.libraries()[i]().mapMarker().setMap(map);
       if (self.libraries()[i]().name().toLowerCase().indexOf(value.toLowerCase()) >= 0) {
         self.filteredLibraries.push(self.libraries()[i]);
+      } else {
+        self.libraries()[i]().mapMarker().setMap(null);
       }
     }
   };
