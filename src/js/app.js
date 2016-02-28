@@ -1,6 +1,12 @@
-
 // AppViewModel
 var AppViewModel = function() {
+
+  // It helps to write more "secure" codes by preventing things such as marking
+  // down a function with bad syntax to execute, using variable before declaring
+  // it or loading unused variables.
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
+  'use strict';
+
   // global this
   var self = this;
 
@@ -25,6 +31,9 @@ var AppViewModel = function() {
 
   // search string from input in table view will be saved here
   self.query = ko.observable('');
+
+  // error object, will be used to store any error
+  self.mapError = ko.observable(false);
 
   // search all libraries
   self.searchAll = function() {
@@ -80,7 +89,7 @@ var AppViewModel = function() {
           self.searchLibraries();
 
         } else { // handle error
-          showNoPlaceFoundPopover();
+          alert('No Place found!, Please try another search term, or enter more specific address');
         }
       });
       // search for libraries
@@ -115,7 +124,7 @@ var AppViewModel = function() {
           self.searchLibraries();
 
         } else { // handle error
-          showNoPlaceFoundPopover();
+          alert('No Place found!, Please try another search term, or enter more specific address');
         }
       });
       // search for libraries

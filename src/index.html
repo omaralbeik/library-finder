@@ -58,22 +58,22 @@
 
       <div class="collapse navbar-collapse" id="menuNavbar">
         <form class="navbar-form navbar-left" role="search" onkeypress="return event.keyCode != 13;">
-          <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-toggle="popover" data-trigger="focus" data-placement="bottom" data-content="No Place found!, Please try another search term, or enter more specific address">
+          <input id="input" type="text" class="form-control controls" placeholder="Search for libraries near:" autocomplete="off" data-bind="visible: !mapError()">
         </form>
         <ul class="nav navbar-nav navbar-left">
-          <li data-bind="css: {'active' : currentTab() === 'all'}">
+          <li data-bind="visible: !mapError(), css: {'active' : currentTab() === 'all'}">
             <a id="all-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchAll">
               <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'all'"></i> All
               <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'all')"></span>
             </a>
           </li>
-          <li data-bind="css: {'active' : currentTab() == 'open'}">
+          <li data-bind="visible: !mapError(), css: {'active' : currentTab() == 'open'}">
             <a id="open-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchOpen">
               <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'open'"></i> Open Now
               <span class="badge" data-bind="text: libraries().length, visible: (libraries().length && currentTab() === 'open')"></span>
             </a>
           </li>
-          <li data-bind="css: {'active' : currentTab() == 'top'}">
+          <li data-bind="visible: !mapError(), css: {'active' : currentTab() == 'top'}">
             <a id="top-button" href="#" data-bind="click: (inSearch() || currentLocation() == null)? null : searchTop">
               <i class="fa fa-circle-o-notch fa-spin" data-bind="visible: inSearch() && currentTab() === 'top'"></i> Top 10
             </a>
@@ -84,10 +84,16 @@
   </div>
 
   <div class="container">
-    <div id="map" class="map"></div>
+    <div id="map" class="map" data-bind="visible: !mapError()"></div>
+    <div class="error" data-bind="visible: mapError()">
+      <h3>Google Maps not available!, try again later.</h3>
+      <button type="button" class="btn btn-primary" data-bind="visible: mapError()" href='#' onclick='location.reload(true); return false;'>Refresh Page</button>
+    </div>
   </div>
 
-  <a data-bind="click: toggleTable" id="table-button" class="btn btn-default " href="#" role="button" data-toggle="popover" data-trigger="focus" data-content="Please search for libraries near a location first."><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list</a>
+  <a data-bind="visible: !mapError(), click: toggleTable" id="table-button" class="btn btn-default" href="#" role="button">
+    <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> Show list
+  </a>
 
   <div class=" container table-container hidden">
     <table id="table" class="table table-condensed list-view">

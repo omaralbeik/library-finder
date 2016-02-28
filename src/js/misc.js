@@ -54,10 +54,3 @@ $('input').addClear();
 // hide table container initially
 $('.table-container').hide();
 $('.table-container').removeClass('hidden');
-
-var showNoPlaceFoundPopover = function() {
-  $('#input').popover('show');
-  setTimeout(function() {
-    $('#input').popover('destroy');
-  }, 2000);
-};

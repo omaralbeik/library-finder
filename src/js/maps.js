@@ -13,12 +13,7 @@ var setCurrentLocation = function(success, error) {
 var setMap = function(location, mapReady) {
 
   if (typeof google === 'undefined') {
-    $('#map').remove();
-    $('#table-button').remove();
-    $('li').addClass('disabled');
-    $('input').prop('disabled', true);
-    $('body').append('<h3 class="error">Google Maps not available!, try again later.</h3>');
-    console.log('not available');
+    appVM.mapError(true); // there was an error loading the map
     return;
 
   } else {
