@@ -33,7 +33,6 @@ var setMap = function(location, mapReady) {
     var input = document.getElementById('input');
     var searchBox = new google.maps.places.SearchBox(input);
     autocomplete = new google.maps.places.Autocomplete(input);
-
     google.maps.event.addListenerOnce(map, 'idle', mapReady);
 
   }

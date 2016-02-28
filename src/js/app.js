@@ -110,7 +110,6 @@ var AppViewModel = function() {
 
     setMap(self.currentLocation(), function() {
       // map is ready
-
       // get place from autocomplete input
       autocomplete.addListener('place_changed', function() {
         var place = autocomplete.getPlace();
@@ -165,6 +164,8 @@ var AppViewModel = function() {
       // get suggested bounds from foursquare and update currentSuggestedBounds
       var suggestedBounds = data.response.suggestedBounds;
       self.currentSuggestedBounds(suggestedBounds);
+
+      map.setZoom(map.getZoom() + 1);
 
       resizeMapToBounds(self.currentSuggestedBounds(), function() {
         // map is ready
