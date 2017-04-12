@@ -1,4 +1,4 @@
-#Library Finder
+# Library Finder
 
 a single page web app, that let you find libraries near a specific place
 
@@ -21,16 +21,16 @@ https://github.com/omaralbeik/library-finder.git
 
 ##### 2. move to project directory and install npm packages and required bower libraries from terminal:
 ``` bash
-$> cd /project_path (change this to project directory)
-$> npm install
-$> bower install
+$ cd /project_path (change this to project directory)
+$ npm install
+$ bower install
 ```
 ##### 4. run project
 on terminal, type gulp to run all tasks required to produce the code, and then type gulp serve to run the produced code:
 
 ``` bash
-$> gulp
-$> gulp serve
+$ gulp
+$ gulp serve
 ```
 
 ### Technologies used
